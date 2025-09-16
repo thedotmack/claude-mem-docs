@@ -5,13 +5,13 @@ description: "Document the memory storage and retrieval APIs"
 
 # Memory API
 
-Claude-mem uses the Model Context Protocol (MCP) to provide standardized memory operations through ChromaDB. This API allows you to store, retrieve, and search through conversation memories programmatically.
+You can use claude-mem with the Model Context Protocol (MCP) to access standardized memory operations through ChromaDB. This API allows you to store, retrieve, and search through your conversation memories programmatically.
 
 ## MCP Client Interface
 
 ### IMCPClient
 
-The core interface for memory operations:
+You can use the core interface for memory operations:
 
 ```typescript
 interface IMCPClient {
@@ -25,7 +25,7 @@ interface IMCPClient {
 
 ### Document Structure
 
-Memory documents follow a standardized format:
+Your memory documents follow a standardized format:
 
 ```typescript
 interface MCPDocument {
@@ -37,7 +37,7 @@ interface MCPDocument {
 
 ### Search Results
 
-Search operations return structured results:
+Your search operations return structured results:
 
 ```typescript
 interface MCPSearchResult {
@@ -51,7 +51,7 @@ interface MCPSearchResult {
 
 ## Available MCP Tools
 
-Claude-mem provides these MCP tools for memory operations:
+You have access to these MCP tools for memory operations:
 
 ### Collection Management
 
@@ -212,7 +212,7 @@ const filteredResults = await mcp__claude_mem__chroma_query_documents(
 
 ## Memory Node Structure
 
-When memories are created through compression, they follow this structure:
+When you create memories through compression, they follow this structure:
 
 ```typescript
 interface MemoryNode {
@@ -233,7 +233,7 @@ interface MemoryNode {
 
 ## Compression Result
 
-The compression process produces structured results:
+Your compression process produces structured results:
 
 ```typescript
 interface CompressionResult {
@@ -247,7 +247,7 @@ interface CompressionResult {
 
 ## Error Handling
 
-Memory operations can throw specific errors:
+Your memory operations can throw specific errors:
 
 ```typescript
 try {
@@ -273,7 +273,7 @@ try {
 
 ### 1. Collection Naming
 
-Use consistent naming conventions:
+You should use consistent naming conventions:
 
 ```typescript
 // Good: project-specific collections
@@ -288,7 +288,7 @@ const collectionName = "memories"; // Too generic
 
 ### 2. Metadata Strategy
 
-Include meaningful metadata for better filtering:
+You should include meaningful metadata for better filtering:
 
 ```typescript
 const metadata = {
@@ -304,7 +304,7 @@ const metadata = {
 
 ### 3. Query Optimization
 
-Use specific queries for better results:
+You should use specific queries for better results:
 
 ```typescript
 // Good: specific, contextual queries
@@ -319,7 +319,7 @@ const query = `${projectName} authentication implementation`;
 
 ### 4. Batch Operations
 
-Process documents in batches for better performance:
+You should process documents in batches for better performance:
 
 ```typescript
 const BATCH_SIZE = 50;
@@ -342,7 +342,7 @@ for (let i = 0; i < documents.length; i += BATCH_SIZE) {
 
 ### With TranscriptCompressor
 
-The compression API automatically handles memory storage:
+Your compression API automatically handles memory storage:
 
 ```typescript
 import { TranscriptCompressor } from 'claude-mem';
@@ -361,7 +361,7 @@ const relatedMemories = await mcp__claude_mem__chroma_query_documents(
 
 ### Custom Memory Storage
 
-Store custom memories outside of transcript compression:
+You can store custom memories outside of transcript compression:
 
 ```typescript
 // Store custom observations or notes

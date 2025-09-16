@@ -5,7 +5,11 @@
   "colors": {
     "primary": "#3B82F6",
     "light": "#EFF6FF",
-    "dark": "#1E40AF"
+    "dark": "#1E40AF",
+    "background": {
+      "light": "#FFFFFF",
+      "dark": "#0F172A"
+    }
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -94,36 +98,95 @@
   },
   "logo": {
     "light": "/claude-mem-logo.webp",
-    "dark": "/claude-mem-logo.webp"
-  },
-  "background": {
-    "color": {
-      "light": "#FFFFFF",
-      "dark": "#0F172A"
-    }
+    "dark": "/claude-mem-logo.webp",
+    "href": "https://github.com/thedotmack/claude-mem"
   },
   "navbar": {
     "links": [
       {
         "label": "GitHub",
         "href": "https://github.com/thedotmack/claude-mem"
+      },
+      {
+        "label": "NPM",
+        "href": "https://www.npmjs.com/package/claude-mem"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Install",
-      "href": "https://www.npmjs.com/package/claude-mem"
+      "label": "Get Started",
+      "href": "/quickstart"
     }
   },
   "footer": {
     "socials": {
       "github": "https://github.com/thedotmack/claude-mem",
       "website": "https://www.npmjs.com/package/claude-mem"
-    }
+    },
+    "links": [
+      {
+        "header": "Documentation",
+        "items": [
+          {
+            "label": "Quick Start",
+            "href": "/quickstart"
+          },
+          {
+            "label": "Installation",
+            "href": "/installation"
+          },
+          {
+            "label": "Configuration",
+            "href": "/configuration/settings"
+          }
+        ]
+      },
+      {
+        "header": "Resources",
+        "items": [
+          {
+            "label": "API Reference",
+            "href": "/api-reference/overview"
+          },
+          {
+            "label": "CLI Commands",
+            "href": "/cli/overview"
+          },
+          {
+            "label": "Contributing",
+            "href": "/advanced/contributing"
+          }
+        ]
+      }
+    ]
   },
   "integrations": {
     "ga4": {
       "measurementId": "G-XXXXXXXXXX"
+    },
+    "telemetry": {
+      "enabled": false
+    }
+  },
+  "api": {
+    "playground": {
+      "display": "interactive"
+    },
+    "examples": {
+      "languages": ["javascript", "typescript", "bash"]
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
+  },
+  "errors": {
+    "404": {
+      "redirect": false
     }
   }
 }

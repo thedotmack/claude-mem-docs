@@ -5,30 +5,30 @@ description: "Configure and customize claude-mem hooks for Claude Code integrati
 
 ## Overview
 
-Claude-mem integrates with Claude Code through a sophisticated hook system that automatically compresses transcripts, loads context, and manages memory across sessions. Hooks are configured in Claude Code's `settings.json` file and can be customized for different workflows.
+You can integrate claude-mem with Claude Code through a sophisticated hook system that automatically compresses transcripts, loads context, and manages memory across your sessions. You configure hooks in Claude Code's `settings.json` file and can customize them for different workflows.
 
 ## Hook Types
 
-Claude-mem provides three main hooks that integrate with Claude Code's lifecycle:
+You have access to three main hooks that integrate with Claude Code's lifecycle:
 
 ### 1. SessionStart Hook
-- **Triggered**: When a new Claude Code session begins
-- **Purpose**: Loads relevant context from previous sessions
+- **Triggered**: When you start a new Claude Code session
+- **Purpose**: Loads relevant context from your previous sessions
 - **Location**: `~/.claude-mem/hooks/session-start.js`
 
 ### 2. PreCompact Hook
-- **Triggered**: Before Claude Code compacts/clears a session
-- **Purpose**: Compresses transcript into memory before data is lost
+- **Triggered**: Before Claude Code compacts/clears your session
+- **Purpose**: Compresses your transcript into memory before data is lost
 - **Location**: `~/.claude-mem/hooks/pre-compact.js`
 
 ### 3. SessionEnd Hook
-- **Triggered**: When Claude Code session ends or `/clear` is used
-- **Purpose**: Optionally saves memories before clearing context
+- **Triggered**: When you end your Claude Code session or use `/clear`
+- **Purpose**: Optionally saves your memories before clearing context
 - **Location**: `~/.claude-mem/hooks/session-end.js`
 
 ## Hook Configuration File
 
-Hooks are configured in Claude Code's settings file at `~/.claude/.claude/settings.json`:
+You configure hooks in Claude Code's settings file at `~/.claude/.claude/settings.json`:
 
 <Tabs>
   <Tab title="Complete Configuration">
@@ -125,7 +125,7 @@ Hooks are configured in Claude Code's settings file at `~/.claude/.claude/settin
 
 ### Environment Variables
 
-Control hook behavior with environment variables:
+You can control hook behavior with environment variables:
 
 ```bash
 # Enable debug logging for hooks
@@ -143,7 +143,7 @@ export CLAUDE_MEM_PROJECT_NAME="my-project"
 
 ### Configuration File Overrides
 
-Create a `config.json` in the hooks directory to override CLI commands:
+You can create a `config.json` in the hooks directory to override CLI commands:
 
 ```json
 {
@@ -181,7 +181,7 @@ You can configure multiple hooks for the same event:
 
 ### Conditional Hook Execution
 
-Hooks can check conditions before executing:
+Your hooks can check conditions before executing:
 
 <Tabs>
   <Tab title="Environment-Based">
@@ -207,7 +207,7 @@ Hooks can check conditions before executing:
 
 ## Hook Response Format
 
-Hooks communicate with Claude Code using standardized JSON responses:
+Your hooks communicate with Claude Code using standardized JSON responses:
 
 ### PreCompact Hook Response
 ```json
@@ -277,7 +277,7 @@ process.stdin.on('end', async () => {
 
 ### Hook Payload Structure
 
-Hooks receive different payloads based on their type:
+Your hooks receive different payloads based on their type:
 
 <Tabs>
   <Tab title="PreCompact Payload">
@@ -307,7 +307,7 @@ Hooks receive different payloads based on their type:
 
 ### Automatic Installation
 
-Claude-mem automatically installs hooks during setup:
+You can automatically install hooks during setup:
 
 ```bash
 # Install hooks with default configuration
