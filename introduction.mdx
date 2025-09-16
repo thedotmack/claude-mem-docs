@@ -1,0 +1,118 @@
+---
+title: 'Introduction'
+description: 'Welcome to Claude Memory System - Your AI conversation memory that actually works'
+---
+
+import { Card, CardGrid } from '/snippets/card-grid.mdx'
+
+# Claude Memory System (claude-mem)
+
+## Remember that one thing? Neither do we… but `claude-mem` does! 😵‍💫
+
+Stop repeating yourself. `claude-mem` remembers what you and Claude Code figure out, so every new chat starts smarter than the last.
+
+<CardGrid cols={2}>
+  <Card title="10-Second Setup" icon="rocket" href="/quickstart">
+    One command to install, automatic integration with Claude Code
+  </Card>
+  <Card title="Smart Context" icon="brain" href="/concepts/how-it-works">
+    Automatically loads relevant memories when you start coding
+  </Card>
+  <Card title="Zero Config" icon="settings" href="/installation">
+    Works out of the box with sensible defaults
+  </Card>
+  <Card title="Smart Trash™" icon="trash" href="/concepts/smart-trash">
+    Never lose anything - deleted items are recoverable
+  </Card>
+</CardGrid>
+
+## Why claude-mem?
+
+Every time you start a new Claude Code session, you're starting from scratch. You have to re-explain your project structure, remind Claude about that bug you fixed yesterday, and repeat the same context over and over.
+
+**claude-mem changes that.**
+
+### 🧠 What it does
+
+- **Remembers key insights** from your coding sessions
+- **Compresses conversations** into searchable memories
+- **Loads relevant context** automatically when you start
+- **Works silently** in the background via hooks
+
+### ✨ Key Features
+
+<CardGrid cols={3}>
+  <Card title="Automatic" icon="wand-magic-sparkles">
+    Hooks into Claude Code lifecycle - no manual commands needed
+  </Card>
+  <Card title="Intelligent" icon="lightbulb">
+    Uses semantic search to find relevant memories
+  </Card>
+  <Card title="Fast" icon="bolt">
+    Minified runtime, efficient compression
+  </Card>
+  <Card title="Safe" icon="shield">
+    Smart Trash™ keeps deleted items recoverable
+  </Card>
+  <Card title="Simple" icon="circle-check">
+    One command install, minimal dependencies
+  </Card>
+  <Card title="Open" icon="code">
+    AGPL-3.0 licensed, fully open source
+  </Card>
+</CardGrid>
+
+## How it works
+
+1. **Install once** - `npm install -g claude-mem && claude-mem install`
+2. **Code normally** - claude-mem watches your Claude Code sessions
+3. **Automatic compression** - When you finish, memories are saved
+4. **Smart loading** - Next session starts with relevant context
+
+No configuration needed. No manual commands. It just works.
+
+## Quick Example
+
+```bash
+# Install globally
+npm install -g claude-mem
+
+# Set up the integration
+claude-mem install
+
+# That's it! Restart Claude Code and you're ready
+```
+
+When you start your next session, you'll see:
+
+```
+📚 Memories
+────────────────────────────────
+🔍 Found 3 relevant memories from previous sessions
+
+1. Fixed authentication bug in login component
+2. Implemented dark mode with Tailwind CSS
+3. Optimized database queries for user dashboard
+────────────────────────────────
+```
+
+## Ready to get started?
+
+<CardGrid cols={2}>
+  <Card title="Quick Start" icon="play" href="/quickstart">
+    Get up and running in 60 seconds
+  </Card>
+  <Card title="Installation Guide" icon="download" href="/installation">
+    Detailed installation instructions
+  </Card>
+</CardGrid>
+
+## Community & Support
+
+- [GitHub Issues](https://github.com/thedotmack/claude-mem/issues) - Report bugs or request features
+- [NPM Package](https://www.npmjs.com/package/claude-mem) - View package details
+- [Contributing](/advanced/contributing) - Help make claude-mem better
+
+---
+
+*Your future self will thank you. 🧠✨*

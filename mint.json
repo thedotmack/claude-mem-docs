@@ -1,0 +1,119 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Claude Memory System",
+  "logo": {
+    "dark": "/logo/dark.svg",
+    "light": "/logo/light.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#3B82F6",
+    "light": "#EFF6FF",
+    "dark": "#1E40AF",
+    "background": {
+      "dark": "#0F172A",
+      "light": "#FFFFFF"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/thedotmack/claude-mem"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "Install",
+    "url": "https://www.npmjs.com/package/claude-mem"
+  },
+  "tabs": [
+    {
+      "name": "Documentation",
+      "url": "/"
+    },
+    {
+      "name": "API Reference",
+      "url": "/api-reference"
+    },
+    {
+      "name": "CLI Commands",
+      "url": "/cli"
+    }
+  ],
+  "anchors": [],
+  "navigation": [
+    {
+      "group": "Get Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "installation"
+      ]
+    },
+    {
+      "group": "Core Concepts",
+      "pages": [
+        "concepts/how-it-works",
+        "concepts/memory-compression",
+        "concepts/context-loading",
+        "concepts/smart-trash"
+      ]
+    },
+    {
+      "group": "Configuration",
+      "pages": [
+        "configuration/settings",
+        "configuration/hooks",
+        "configuration/claude-integration"
+      ]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "guides/getting-started",
+        "guides/troubleshooting",
+        "guides/best-practices",
+        "guides/development"
+      ]
+    },
+    {
+      "group": "CLI Reference",
+      "pages": [
+        "cli/overview",
+        "cli/install",
+        "cli/status",
+        "cli/load-context",
+        "cli/logs",
+        "cli/trash-view",
+        "cli/restore",
+        "cli/uninstall"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/overview",
+        "api-reference/memory-api",
+        "api-reference/compression-api",
+        "api-reference/hooks-api"
+      ]
+    },
+    {
+      "group": "Advanced",
+      "pages": [
+        "advanced/architecture",
+        "advanced/mcp-integration",
+        "advanced/custom-hooks",
+        "advanced/contributing"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/thedotmack/claude-mem",
+    "website": "https://www.npmjs.com/package/claude-mem"
+  },
+  "analytics": {
+    "ga4": {
+      "measurementId": "G-XXXXXXXXXX"
+    }
+  }
+}

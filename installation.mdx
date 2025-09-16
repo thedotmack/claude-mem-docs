@@ -1,0 +1,297 @@
+---
+title: 'Installation'
+description: 'Detailed installation instructions for claude-mem'
+---
+
+import { Steps } from '/snippets/steps.mdx'
+import { Tabs, Tab } from '/snippets/tabs.mdx'
+
+# Installation Guide
+
+Complete guide for installing and configuring claude-mem with Claude Code.
+
+## System Requirements
+
+<CardGrid cols={2}>
+  <Card title="Required" icon="check-circle">
+    - Node.js 18.0.0 or higher
+    - Claude Code desktop application
+    - 100MB free disk space
+  </Card>
+  <Card title="Recommended" icon="star">
+    - Bun runtime (faster)
+    - macOS/Linux (better hook support)
+    - Git for version control
+  </Card>
+</CardGrid>
+
+## Installation Methods
+
+<Tabs>
+  <Tab title="npm (Recommended)">
+    <Steps>
+      ### Install globally
+      ```bash
+      npm install -g claude-mem
+      ```
+
+      ### Run installer
+      ```bash
+      claude-mem install
+      ```
+
+      ### Restart Claude Code
+      Close and reopen the application
+    </Steps>
+  </Tab>
+
+  <Tab title="Bun">
+    <Steps>
+      ### Install with bun
+      ```bash
+      bun install -g claude-mem
+      ```
+
+      ### Run installer
+      ```bash
+      claude-mem install
+      ```
+
+      ### Restart Claude Code
+      Close and reopen the application
+    </Steps>
+  </Tab>
+
+  <Tab title="From Source">
+    <Steps>
+      ### Clone repository
+      ```bash
+      git clone https://github.com/thedotmack/claude-mem.git
+      cd claude-mem
+      ```
+
+      ### Install dependencies
+      ```bash
+      bun install
+      ```
+
+      ### Build and link
+      ```bash
+      bun run build
+      bun link
+      ```
+
+      ### Install integration
+      ```bash
+      claude-mem install
+      ```
+    </Steps>
+  </Tab>
+</Tabs>
+
+## What Gets Installed
+
+The installer creates the following structure:
+
+```
+~/.claude-mem/
+├── index/          # Memory storage (Chroma DB)
+├── archives/       # Compressed transcripts
+├── hooks/          # Claude Code integration hooks
+│   ├── pre-compact.js
+│   ├── session-start.js
+│   └── session-end.js
+├── trash/          # Smart Trash™ for recovery
+├── logs/           # Activity logs
+└── settings.json   # Configuration
+```
+
+### Hook Integration
+
+claude-mem integrates with Claude Code through hooks:
+
+- **session-start**: Loads relevant memories when you begin
+- **session-end**: Compresses and saves conversation
+- **pre-compact**: Handles `/compact` command
+
+### MCP Server Configuration
+
+The installer configures the Chroma MCP server in Claude Code:
+
+```json
+{
+  "mcpServers": {
+    "chromadb-claude-mem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-chromadb"]
+    }
+  }
+}
+```
+
+## Verification
+
+After installation, verify everything is working:
+
+<Steps>
+
+### Check installation status
+
+```bash
+claude-mem status
+```
+
+Expected output:
+```
+🧠 Claude Memory System Status
+────────────────────────────────
+
+✅ Installation: Complete
+✅ Hooks: 3 hooks installed
+✅ MCP Server: Configured
+✅ Settings: Found at ~/.claude-mem/settings.json
+✅ Database: Chroma DB ready
+```
+
+### Test memory loading
+
+```bash
+claude-mem load-context
+```
+
+### Check logs
+
+```bash
+claude-mem logs
+```
+
+</Steps>
+
+## Configuration Options
+
+During installation, you can configure:
+
+<AccordionGroup>
+  <Accordion title="Save on Clear">
+    Automatically compress memories when using `/clear` command
+    ```bash
+    claude-mem install --save-on-clear
+    ```
+  </Accordion>
+
+  <Accordion title="Force Reinstall">
+    Overwrites existing installation
+    ```bash
+    claude-mem install --force
+    ```
+  </Accordion>
+
+  <Accordion title="Custom Directory">
+    Install to a different location
+    ```bash
+    claude-mem install --dir ~/custom/path
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Platform-Specific Notes
+
+<Tabs>
+  <Tab title="macOS">
+    <Note>
+      Hooks work best on macOS. No additional configuration needed.
+    </Note>
+  </Tab>
+
+  <Tab title="Linux">
+    <Warning>
+      Ensure Node.js has proper permissions:
+      ```bash
+      sudo npm install -g claude-mem
+      ```
+    </Warning>
+  </Tab>
+
+  <Tab title="Windows">
+    <Warning>
+      Run as Administrator for first installation:
+      ```powershell
+      npm install -g claude-mem
+      ```
+      Note: Some hook features may have limited support.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Updating claude-mem
+
+To update to the latest version:
+
+```bash
+npm update -g claude-mem
+claude-mem install --force
+```
+
+## Uninstalling
+
+To completely remove claude-mem:
+
+```bash
+# Remove hooks and config
+claude-mem uninstall
+
+# Uninstall package
+npm uninstall -g claude-mem
+
+# Optional: Remove data directory
+rm -rf ~/.claude-mem
+```
+
+<Warning>
+  Removing `~/.claude-mem` will delete all your saved memories. Consider backing up first.
+</Warning>
+
+## Troubleshooting Installation
+
+<AccordionGroup>
+  <Accordion title="Permission denied errors">
+    Use `sudo` on macOS/Linux:
+    ```bash
+    sudo npm install -g claude-mem
+    ```
+  </Accordion>
+
+  <Accordion title="Command not found">
+    Ensure npm's global bin is in your PATH:
+    ```bash
+    export PATH="$PATH:$(npm bin -g)"
+    ```
+  </Accordion>
+
+  <Accordion title="Hooks not triggering">
+    1. Restart Claude Code completely
+    2. Run `claude-mem install --force`
+    3. Check logs: `claude-mem logs`
+  </Accordion>
+
+  <Accordion title="MCP server errors">
+    Ensure chromadb is accessible:
+    ```bash
+    npx @modelcontextprotocol/server-chromadb
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGrid cols={3}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Start using claude-mem
+  </Card>
+  <Card title="Configuration" icon="cog" href="/configuration/settings">
+    Customize your setup
+  </Card>
+  <Card title="How It Works" icon="info" href="/concepts/how-it-works">
+    Understand the internals
+  </Card>
+</CardGrid>

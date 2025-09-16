@@ -1,0 +1,211 @@
+---
+title: 'CLI Overview'
+description: 'Complete reference for claude-mem command-line interface'
+---
+
+# CLI Reference
+
+claude-mem provides a simple yet powerful command-line interface for managing your memory system.
+
+## Available Commands
+
+<CardGrid cols={2}>
+  <Card title="install" icon="download" href="/cli/install">
+    Set up claude-mem integration
+  </Card>
+  <Card title="status" icon="heart-pulse" href="/cli/status">
+    Check system health
+  </Card>
+  <Card title="load-context" icon="brain" href="/cli/load-context">
+    Preview available memories
+  </Card>
+  <Card title="logs" icon="scroll" href="/cli/logs">
+    View activity logs
+  </Card>
+  <Card title="trash-view" icon="trash" href="/cli/trash-view">
+    See deleted items
+  </Card>
+  <Card title="restore" icon="rotate-left" href="/cli/restore">
+    Recover from trash
+  </Card>
+  <Card title="uninstall" icon="times" href="/cli/uninstall">
+    Remove integration
+  </Card>
+</CardGrid>
+
+## Basic Usage
+
+```bash
+claude-mem <command> [options]
+```
+
+### Global Options
+
+| Option | Description |
+|--------|------------|
+| `--version` | Show version number |
+| `--help` | Show help for command |
+| `--verbose` | Enable verbose output |
+| `--quiet` | Suppress output |
+
+## Command Categories
+
+### Setup & Configuration
+
+Commands for initial setup and configuration:
+
+- `install` - Initial setup
+- `uninstall` - Remove integration
+- `status` - Verify installation
+
+### Memory Operations
+
+Commands for working with memories:
+
+- `load-context` - View memories
+- `compress` - Manual compression
+- `search` - Search memories
+
+### Maintenance
+
+Commands for system maintenance:
+
+- `logs` - View logs
+- `trash-view` - See trash
+- `restore` - Recover items
+- `clean` - Clean old data
+
+## Quick Examples
+
+### Check Everything is Working
+
+```bash
+claude-mem status
+```
+
+### View Recent Memories
+
+```bash
+claude-mem load-context --limit 5
+```
+
+### Check Logs for Issues
+
+```bash
+claude-mem logs --tail 20
+```
+
+### Restore Deleted Memory
+
+```bash
+claude-mem restore <memory-id>
+```
+
+## Output Formats
+
+Most commands support multiple output formats:
+
+```bash
+# Default human-readable
+claude-mem status
+
+# JSON output
+claude-mem status --json
+
+# Minimal output
+claude-mem status --quiet
+```
+
+## Configuration File
+
+claude-mem uses `~/.claude-mem/settings.json`:
+
+```json
+{
+  "saveMemoriesOnClear": true,
+  "maxMemories": 100,
+  "compressionLevel": "balanced",
+  "logLevel": "info"
+}
+```
+
+## Environment Variables
+
+You can override settings with environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `CLAUDE_MEM_DIR` | Data directory | `~/.claude-mem` |
+| `CLAUDE_MEM_LOG_LEVEL` | Log verbosity | `info` |
+| `CLAUDE_MEM_MAX_MEMORIES` | Memory limit | `100` |
+
+## Exit Codes
+
+claude-mem uses standard exit codes:
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `1` | General error |
+| `2` | Missing command |
+| `3` | Invalid arguments |
+| `4` | Installation error |
+| `5` | Permission denied |
+
+## Scripting
+
+claude-mem commands are designed for scripting:
+
+```bash
+#!/bin/bash
+
+# Check status and install if needed
+if ! claude-mem status --quiet; then
+    claude-mem install --force
+fi
+
+# Load context and save to file
+claude-mem load-context --json > memories.json
+
+# Backup memories
+tar -czf backup.tar.gz ~/.claude-mem/
+```
+
+## Command Aliases
+
+Common shortcuts:
+
+```bash
+# Add to your shell profile
+alias cm='claude-mem'
+alias cms='claude-mem status'
+alias cml='claude-mem logs --tail 20'
+alias cmc='claude-mem load-context'
+```
+
+## Getting Help
+
+Each command has detailed help:
+
+```bash
+# General help
+claude-mem --help
+
+# Command-specific help
+claude-mem install --help
+claude-mem status --help
+```
+
+## Next Steps
+
+<CardGrid cols={3}>
+  <Card title="install" icon="download" href="/cli/install">
+    Installation command
+  </Card>
+  <Card title="status" icon="heart-pulse" href="/cli/status">
+    Status command
+  </Card>
+  <Card title="load-context" icon="brain" href="/cli/load-context">
+    Context loading
+  </Card>
+</CardGrid>

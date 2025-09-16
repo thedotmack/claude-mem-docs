@@ -1,0 +1,27 @@
+{
+  "name": "claude-mem-docs",
+  "version": "1.0.0",
+  "description": "Documentation for Claude Memory System",
+  "scripts": {
+    "dev": "mint dev",
+    "build": "mint build",
+    "preview": "mint preview",
+    "deploy": "mint deploy"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thedotmack/claude-mem-docs.git"
+  },
+  "keywords": [
+    "documentation",
+    "claude-mem",
+    "mintlify",
+    "claude-code"
+  ],
+  "author": "Alex Newman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thedotmack/claude-mem-docs/issues"
+  },
+  "homepage": "https://docs.claude-mem.com"
+}
