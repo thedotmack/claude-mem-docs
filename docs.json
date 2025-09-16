@@ -5,11 +5,7 @@
   "colors": {
     "primary": "#3B82F6",
     "light": "#EFF6FF",
-    "dark": "#1E40AF",
-    "background": {
-      "light": "#FFFFFF",
-      "dark": "#0F172A"
-    }
+    "dark": "#1E40AF"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -115,7 +111,7 @@
     "primary": {
       "type": "button",
       "label": "Get Started",
-      "href": "/quickstart"
+      "href": "https://github.com/thedotmack/claude-mem"
     }
   },
   "footer": {
@@ -129,15 +125,15 @@
         "items": [
           {
             "label": "Quick Start",
-            "href": "/quickstart"
+            "href": "https://github.com/thedotmack/claude-mem#quickstart"
           },
           {
             "label": "Installation",
-            "href": "/installation"
+            "href": "https://github.com/thedotmack/claude-mem#installation"
           },
           {
             "label": "Configuration",
-            "href": "/configuration/settings"
+            "href": "https://github.com/thedotmack/claude-mem#configuration"
           }
         ]
       },
@@ -146,15 +142,15 @@
         "items": [
           {
             "label": "API Reference",
-            "href": "/api-reference/overview"
+            "href": "https://github.com/thedotmack/claude-mem#api-reference"
           },
           {
             "label": "CLI Commands",
-            "href": "/cli/overview"
+            "href": "https://github.com/thedotmack/claude-mem#cli-commands"
           },
           {
             "label": "Contributing",
-            "href": "/advanced/contributing"
+            "href": "https://github.com/thedotmack/claude-mem#contributing"
           }
         ]
       }
