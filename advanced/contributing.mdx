@@ -1,0 +1,599 @@
+---
+title: "Contributing Guidelines"
+description: "Development setup, coding standards, and contribution workflow for claude-mem"
+icon: "code-merge"
+---
+
+# Contributing to Claude-mem
+
+This guide covers everything you need to contribute to claude-mem, from development setup to testing patterns and the project's unique development philosophy.
+
+## Development Philosophy
+
+Claude-mem follows the **"Make It Work First"** manifesto. This approach prioritizes:
+
+1. **Direct implementation** over defensive programming
+2. **Natural failure modes** over artificial guards
+3. **Real problem solving** over theoretical edge case handling
+4. **Readable intent** over comprehensive validation
+
+### Code Style Principles
+
+```typescript
+// ✅ GOOD: Direct, clear intent
+function processTranscript(path: string): TranscriptMessage[] {
+  const content = fs.readFileSync(path, 'utf-8');
+  return content.split('\n').map(line => JSON.parse(line));
+}
+
+// ❌ AVOID: Defensive fortress
+function processTranscript(path: string): TranscriptMessage[] {
+  if (!path) throw new Error('Path required');
+  if (typeof path !== 'string') throw new Error('Path must be string');
+  if (!fs.existsSync(path)) throw new Error('File not found');
+
+  const content = fs.readFileSync(path, 'utf-8');
+  if (!content) throw new Error('Empty file');
+
+  return content.split('\n').map(line => {
+    try {
+      const parsed = JSON.parse(line);
+      if (!parsed) throw new Error('Invalid JSON');
+      return parsed;
+    } catch (e) {
+      throw new Error(`Parse error: ${e.message}`);
+    }
+  });
+}
+```
+
+## Development Setup
+
+### Prerequisites
+
+- **Bun** (required, no npm allowed)
+- **Node.js** 18+
+- **ChromaDB** (installed automatically)
+- **Claude Code** CLI
+
+### Local Development Environment
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/thedotmack/claude-mem.git
+cd claude-mem
+
+# 2. Install dependencies (using Bun)
+bun install
+
+# 3. Build the project
+bun run build
+
+# 4. Create local development link
+bun link
+
+# 5. Link for local testing
+bun link claude-mem
+
+# 6. Verify installation
+claude-mem --version
+
+# 7. Force reinstall hooks for development
+claude-mem install --force
+```
+
+### Development Workflow
+
+```bash
+# Make changes to source code in src/
+
+# 1. Build changes
+bun run build
+
+# 2. Test manually
+claude-mem compress path/to/transcript.jsonl
+
+# 3. Test hooks (restart Claude Code to apply changes)
+# Hooks are copied during build, so restart is required
+
+# 4. Run comprehensive tests
+bun test
+
+# 5. Verify CLI commands
+claude-mem status
+claude-mem load-context --project test
+```
+
+## Project Structure
+
+### Source Code Organization
+
+```
+src/
+├── bin/
+│   └── cli.ts                    # Main CLI entry point
+├── commands/                     # CLI command implementations
+│   ├── compress.ts
+│   ├── install.ts
+│   ├── load-context.ts
+│   └── ...
+├── core/                         # Core processing logic
+│   ├── compression/
+│   │   ├── TranscriptCompressor.ts
+│   │   └── ChunkManager.ts
+│   ├── orchestration/
+│   │   └── PromptOrchestrator.ts
+│   └── titles/
+│       └── TitleGenerator.ts
+├── services/                     # Shared services
+│   ├── path-discovery.ts
+│   ├── transcript-parser.ts
+│   └── conversation-selector.ts
+├── shared/                       # Utilities and types
+│   ├── config.ts
+│   ├── logger.ts
+│   ├── paths.ts
+│   ├── settings.ts
+│   └── types.ts
+├── prompts/                      # LLM prompt templates
+│   └── templates/
+│       └── analysis/
+└── ui/                          # User interface helpers
+    └── formatting.ts
+```
+
+### Hook System Structure
+
+```
+hooks/
+├── session-start.js              # Session initialization
+├── session-end.js                # Session cleanup
+├── pre-compact.js                # Pre-compression triggers
+└── shared/                       # Shared hook utilities
+    ├── hook-helpers.js
+    ├── config-loader.js
+    └── path-resolver.js
+```
+
+## Coding Standards
+
+### TypeScript Guidelines
+
+```typescript
+// Use clear, descriptive interfaces
+export interface AnalysisContext {
+  transcriptContent: string;
+  sessionId: string;
+  projectName?: string;
+  customInstructions?: string;
+}
+
+// Prefer composition over inheritance
+export class TranscriptCompressor {
+  private paths: PathResolver;
+  private promptOrchestrator: PromptOrchestrator;
+  private chunkManager: ChunkManager;
+
+  constructor(options: CompressionOptions = {}) {
+    this.paths = new PathResolver();
+    this.promptOrchestrator = new PromptOrchestrator();
+    this.chunkManager = new ChunkManager();
+  }
+}
+
+// Use factory functions for complex construction
+export function createAnalysisContext(
+  transcriptContent: string,
+  sessionId: string,
+  options: Partial<Omit<AnalysisContext, 'transcriptContent' | 'sessionId'>> = {}
+): AnalysisContext {
+  return {
+    transcriptContent,
+    sessionId,
+    ...options,
+  };
+}
+```
+
+### Error Handling Patterns
+
+Follow the "Make It Work First" philosophy:
+
+```typescript
+// ✅ GOOD: Natural failure with context
+async function compressTranscript(path: string): Promise<string> {
+  const content = fs.readFileSync(path, 'utf-8');
+  const messages = this.parseMessages(content);
+
+  // Continue processing even with parse errors
+  const validMessages = messages.filter(Boolean);
+
+  if (validMessages.length === 0) {
+    log.debug('No valid messages found, creating empty archive');
+    return this.createEmptyArchive(path);
+  }
+
+  return this.processMessages(validMessages);
+}
+
+// ❌ AVOID: Defensive exits
+async function compressTranscript(path: string): Promise<string> {
+  if (!path) {
+    throw new Error('Path is required');
+  }
+
+  if (!fs.existsSync(path)) {
+    throw new Error('File does not exist');
+  }
+
+  const stats = fs.statSync(path);
+  if (stats.size === 0) {
+    throw new Error('File is empty');
+  }
+
+  // ... more validation
+}
+```
+
+### Logging Standards
+
+```typescript
+import { log } from '../shared/logger.js';
+
+// Use structured logging with context
+log.debug('Starting compression', {
+  transcriptPath,
+  sessionId,
+  projectName
+});
+
+// Provide actionable error information
+log.error('Compression failed', error, {
+  transcriptPath,
+  sessionId,
+  troubleshooting: 'Check transcript format and permissions'
+});
+
+// Use debug logs for development insight
+log.debug(DEBUG_MESSAGES.TRANSCRIPT_STATS(contentLength, messageCount));
+```
+
+## Testing Strategies
+
+### Manual Testing Workflow
+
+```bash
+# 1. Create test transcript
+echo '{"type":"user","content":"test message"}' > test.jsonl
+
+# 2. Test compression
+claude-mem compress test.jsonl
+
+# 3. Verify memory storage
+claude-mem load-context --project test
+
+# 4. Test hooks
+# Create new Claude Code session and verify context loading
+
+# 5. Test edge cases
+echo '' > empty.jsonl
+claude-mem compress empty.jsonl  # Should handle gracefully
+
+# 6. Test large transcripts
+# Generate large test file and verify chunking
+```
+
+### Integration Testing
+
+```typescript
+// Example integration test
+export async function testCompressionWorkflow() {
+  const testDir = '/tmp/claude-mem-test';
+  const transcriptPath = path.join(testDir, 'test.jsonl');
+
+  // Setup
+  fs.mkdirSync(testDir, { recursive: true });
+  fs.writeFileSync(transcriptPath, createTestTranscript());
+
+  // Test compression
+  const compressor = new TranscriptCompressor();
+  const archivePath = await compressor.compress(transcriptPath);
+
+  // Verify results
+  assert(fs.existsSync(archivePath));
+
+  // Test context loading
+  const contextResult = await executeCliCommand('claude-mem', [
+    'load-context',
+    '--project', 'test',
+    '--count', '5'
+  ]);
+
+  assert(contextResult.success);
+
+  // Cleanup
+  fs.rmSync(testDir, { recursive: true });
+}
+```
+
+### Hook Testing
+
+```javascript
+// Test hook execution
+export async function testSessionStartHook() {
+  const hookPath = './hooks/session-start.js';
+
+  const testPayload = {
+    source: 'startup',
+    session_id: 'test-session',
+    project_name: 'test-project'
+  };
+
+  const result = await executeHook(hookPath, testPayload);
+
+  assert(result.success);
+  assert(result.response.continue === true);
+  assert(result.response.hookSpecificOutput);
+}
+
+async function executeHook(hookPath, payload) {
+  return new Promise((resolve) => {
+    const hook = spawn('node', [hookPath]);
+
+    let stdout = '';
+    hook.stdout.on('data', (data) => stdout += data);
+
+    hook.on('close', (code) => {
+      try {
+        const response = JSON.parse(stdout);
+        resolve({ success: code === 0, response });
+      } catch (error) {
+        resolve({ success: false, error: error.message });
+      }
+    });
+
+    hook.stdin.write(JSON.stringify(payload));
+    hook.stdin.end();
+  });
+}
+```
+
+## Contribution Workflow
+
+### 1. Issue Creation
+
+Before implementing features or fixes:
+
+1. **Search existing issues** to avoid duplicates
+2. **Create descriptive issues** with:
+   - Clear problem statement
+   - Expected vs actual behavior
+   - Minimal reproduction steps
+   - Environment details
+
+### 2. Development Process
+
+```bash
+# 1. Create feature branch
+git checkout -b feature/your-feature-name
+
+# 2. Implement following "Make It Work First"
+# - Write the working solution first
+# - Add safety only for real problems encountered
+# - Keep code readable and direct
+
+# 3. Test thoroughly
+bun run build
+claude-mem install --force
+# Test in real Claude Code session
+
+# 4. Document if needed
+# Only create docs if explicitly adding new features
+# Update existing docs if changing behavior
+
+# 5. Commit with clear messages
+git commit -m "Add memory compression chunking for large transcripts
+
+- Implement ChunkManager for token-based splitting
+- Add context overlap between chunks
+- Handle edge case of single very large message"
+```
+
+### 3. Pull Request Guidelines
+
+#### PR Title Format
+```
+<type>: <description>
+
+Examples:
+feat: Add chunked processing for large transcripts
+fix: Handle malformed JSON in transcript parsing
+docs: Update installation guide for Windows
+refactor: Simplify PromptOrchestrator interface
+```
+
+#### PR Description Template
+```markdown
+## Summary
+Brief description of changes and motivation.
+
+## Changes
+- Specific change 1
+- Specific change 2
+- etc.
+
+## Testing
+How this was tested:
+- [ ] Manual testing with sample transcripts
+- [ ] Hook integration testing
+- [ ] Edge case validation
+
+## Breaking Changes
+List any breaking changes or "none"
+
+## Related Issues
+Fixes #123
+```
+
+### 4. Code Review Process
+
+#### For Reviewers
+
+1. **Focus on intent clarity** - Can you understand what the code does?
+2. **Check for "Make It Work First" adherence** - No defensive fortresses?
+3. **Verify real problem solving** - Does it solve actual issues?
+4. **Test the changes** - Does it work in practice?
+
+#### Review Checklist
+
+- [ ] Code follows project philosophy
+- [ ] No unnecessary defensive programming
+- [ ] Error handling is natural and helpful
+- [ ] Logging provides useful context
+- [ ] Changes are manually tested
+- [ ] No new theoretical edge cases added
+- [ ] Documentation updated if behavior changes
+
+## Release Process
+
+### Version Bumping
+
+```bash
+# 1. Update version in package.json manually
+# Follow semantic versioning
+
+# 2. Build minified version
+bun run build
+
+# 3. Update CHANGELOG.md with changes
+# Use claude-mem changelog command if appropriate
+
+# 4. Commit version bump
+git commit -m "🚀 Release v3.x.x"
+
+# 5. Tag release
+git tag v3.x.x
+
+# 6. Push with tags
+git push origin main --tags
+```
+
+### Release Checklist
+
+- [ ] Version bumped in package.json
+- [ ] CHANGELOG.md updated
+- [ ] All tests passing
+- [ ] Manual testing completed
+- [ ] Breaking changes documented
+- [ ] Migration guide provided (if needed)
+
+## Development Tools
+
+### Useful Commands
+
+```bash
+# Quick development cycle
+bun run dev          # Watch mode for development
+bun run build        # Build for testing
+bun run test         # Run all tests
+bun run lint         # Check code style
+
+# Hook development
+bun run test:hooks   # Test hook execution
+bun run install:dev  # Install development hooks
+
+# Debugging
+claude-mem compress --verbose path/to/transcript.jsonl
+claude-mem logs --debug --tail 100
+```
+
+### IDE Configuration
+
+For VS Code, recommended extensions:
+- TypeScript and JavaScript Language Features
+- ESLint
+- Prettier
+- Error Lens
+
+Workspace settings:
+```json
+{
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  }
+}
+```
+
+## Common Pitfalls
+
+### Avoid These Patterns
+
+```typescript
+// ❌ Don't add theoretical validation
+function processMessage(msg: any) {
+  if (!msg) throw new Error('Message required');
+  if (typeof msg !== 'object') throw new Error('Invalid message type');
+  if (!msg.content && !msg.text) throw new Error('Message content required');
+
+  // The actual work is buried
+  return extractContent(msg);
+}
+
+// ❌ Don't over-engineer error handling
+try {
+  await processTranscript(path);
+} catch (error) {
+  if (error.code === 'ENOENT') {
+    throw new CustomFileNotFoundError(path);
+  } else if (error.code === 'EACCES') {
+    throw new CustomPermissionError(path);
+  } else {
+    throw new CustomUnknownError(error);
+  }
+}
+```
+
+### Follow These Patterns
+
+```typescript
+// ✅ Direct implementation
+function processMessage(msg: any): string {
+  return extractContent(msg);
+}
+
+// ✅ Natural error handling
+async function processTranscript(path: string): Promise<string> {
+  const content = fs.readFileSync(path, 'utf-8');
+  const messages = content.split('\n').map(line => {
+    try {
+      return JSON.parse(line);
+    } catch (e) {
+      log.debug(`Skipping malformed line: ${line}`);
+      return null;
+    }
+  }).filter(Boolean);
+
+  return processMessages(messages);
+}
+```
+
+## Getting Help
+
+### Resources
+
+- **Documentation:** /docs in repository
+- **Issues:** GitHub issues for bugs and features
+- **Discussions:** GitHub discussions for questions
+- **Code Examples:** Look at existing commands and tests
+
+### Community Guidelines
+
+1. **Be respectful** and constructive
+2. **Search before asking** - check existing issues/discussions
+3. **Provide context** - include error messages, environment details
+4. **Share solutions** - document fixes you discover
+5. **Follow the philosophy** - embrace "Make It Work First"
+
+Contributing to claude-mem means embracing a philosophy of simplicity, directness, and solving real problems. Focus on making things work naturally rather than defending against theoretical issues.

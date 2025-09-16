@@ -1,0 +1,479 @@
+---
+title: "Hook Configuration"
+description: "Configure and customize claude-mem hooks for Claude Code integration"
+---
+
+## Overview
+
+Claude-mem integrates with Claude Code through a sophisticated hook system that automatically compresses transcripts, loads context, and manages memory across sessions. Hooks are configured in Claude Code's `settings.json` file and can be customized for different workflows.
+
+## Hook Types
+
+Claude-mem provides three main hooks that integrate with Claude Code's lifecycle:
+
+### 1. SessionStart Hook
+- **Triggered**: When a new Claude Code session begins
+- **Purpose**: Loads relevant context from previous sessions
+- **Location**: `~/.claude-mem/hooks/session-start.js`
+
+### 2. PreCompact Hook
+- **Triggered**: Before Claude Code compacts/clears a session
+- **Purpose**: Compresses transcript into memory before data is lost
+- **Location**: `~/.claude-mem/hooks/pre-compact.js`
+
+### 3. SessionEnd Hook
+- **Triggered**: When Claude Code session ends or `/clear` is used
+- **Purpose**: Optionally saves memories before clearing context
+- **Location**: `~/.claude-mem/hooks/session-end.js`
+
+## Hook Configuration File
+
+Hooks are configured in Claude Code's settings file at `~/.claude/.claude/settings.json`:
+
+<Tabs>
+  <Tab title="Complete Configuration">
+    ```json
+    {
+      "hooks": {
+        "PreCompact": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "/Users/username/.claude-mem/hooks/pre-compact.js",
+                "timeout": 180000
+              }
+            ]
+          }
+        ],
+        "SessionStart": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "/Users/username/.claude-mem/hooks/session-start.js"
+              }
+            ]
+          }
+        ],
+        "SessionEnd": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "/Users/username/.claude-mem/hooks/session-end.js",
+                "timeout": 180000
+              }
+            ]
+          }
+        ]
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Minimal Configuration">
+    ```json
+    {
+      "hooks": {
+        "PreCompact": [
+          {
+            "hooks": [
+              {
+                "type": "command",
+                "command": "/Users/username/.claude-mem/hooks/pre-compact.js"
+              }
+            ]
+          }
+        ]
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Hook Configuration Options
+
+### Command Type
+- **type**: Always `"command"` for claude-mem hooks
+- **command**: Absolute path to the hook script
+- **timeout**: Maximum execution time in milliseconds (default: 120000)
+
+### Timeout Settings
+
+<Tabs>
+  <Tab title="Recommended Timeouts">
+    ```json
+    {
+      "PreCompact": { "timeout": 180000 },  // 3 minutes for compression
+      "SessionStart": { "timeout": 60000 }, // 1 minute for loading
+      "SessionEnd": { "timeout": 180000 }   // 3 minutes for saving
+    }
+    ```
+  </Tab>
+  <Tab title="Fast Environment">
+    ```json
+    {
+      "PreCompact": { "timeout": 60000 },   // 1 minute
+      "SessionStart": { "timeout": 30000 }, // 30 seconds
+      "SessionEnd": { "timeout": 60000 }    // 1 minute
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Hook Behavior Customization
+
+### Environment Variables
+
+Control hook behavior with environment variables:
+
+```bash
+# Enable debug logging for hooks
+export CLAUDE_MEM_DEBUG=true
+
+# Disable auto-compression
+export DISABLE_AUTO_COMPRESSION=true
+
+# Silent operation
+export CLAUDE_MEM_SILENT=true
+
+# Custom project name
+export CLAUDE_MEM_PROJECT_NAME="my-project"
+```
+
+### Configuration File Overrides
+
+Create a `config.json` in the hooks directory to override CLI commands:
+
+```json
+{
+  "cliCommand": "claude-mem"
+}
+```
+
+## Advanced Hook Configuration
+
+### Multiple Hook Instances
+
+You can configure multiple hooks for the same event:
+
+```json
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/path/to/custom-pre-hook.js"
+          },
+          {
+            "type": "command",
+            "command": "/Users/username/.claude-mem/hooks/pre-compact.js",
+            "timeout": 180000
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Conditional Hook Execution
+
+Hooks can check conditions before executing:
+
+<Tabs>
+  <Tab title="Environment-Based">
+    ```javascript
+    // In custom hook
+    if (process.env.NODE_ENV === 'development') {
+      // Skip compression in dev
+      process.exit(0);
+    }
+    ```
+  </Tab>
+  <Tab title="Project-Based">
+    ```javascript
+    // In custom hook
+    const projectName = path.basename(process.cwd());
+    if (projectName === 'temp-project') {
+      // Skip for temporary projects
+      process.exit(0);
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Hook Response Format
+
+Hooks communicate with Claude Code using standardized JSON responses:
+
+### PreCompact Hook Response
+```json
+{
+  "continue": true,
+  "suppressOutput": true
+}
+```
+
+### SessionStart Hook Response
+```json
+{
+  "continue": true,
+  "suppressOutput": true,
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "🧠 Loaded 15 memories from previous sessions..."
+  }
+}
+```
+
+### Error Response
+```json
+{
+  "continue": false,
+  "stopReason": "Compression failed: disk full",
+  "suppressOutput": true
+}
+```
+
+## Hook Development
+
+### Creating Custom Hooks
+
+You can create custom hooks that integrate with claude-mem:
+
+```javascript
+#!/usr/bin/env node
+
+import { spawn } from 'child_process';
+
+// Read hook payload from stdin
+let input = '';
+process.stdin.setEncoding('utf8');
+process.stdin.on('data', chunk => input += chunk);
+
+process.stdin.on('end', async () => {
+  try {
+    const payload = JSON.parse(input);
+
+    // Your custom logic here
+
+    // Return standardized response
+    console.log(JSON.stringify({
+      continue: true,
+      suppressOutput: true
+    }));
+
+  } catch (error) {
+    console.log(JSON.stringify({
+      continue: false,
+      stopReason: error.message
+    }));
+  }
+});
+```
+
+### Hook Payload Structure
+
+Hooks receive different payloads based on their type:
+
+<Tabs>
+  <Tab title="PreCompact Payload">
+    ```typescript
+    interface PreCompactPayload {
+      session_id: string;
+      transcript_path: string;
+      hook_event_name: 'PreCompact';
+      trigger: 'manual' | 'auto';
+      custom_instructions?: string;
+    }
+    ```
+  </Tab>
+  <Tab title="SessionStart Payload">
+    ```typescript
+    interface SessionStartPayload {
+      session_id: string;
+      transcript_path: string;
+      hook_event_name: 'SessionStart';
+      source: 'startup' | 'compact' | 'vscode' | 'web';
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Installation and Management
+
+### Automatic Installation
+
+Claude-mem automatically installs hooks during setup:
+
+```bash
+# Install hooks with default configuration
+claude-mem install
+
+# Force reinstall hooks
+claude-mem install --force
+
+# Install to custom location
+claude-mem install --local --path /custom/path
+```
+
+### Manual Hook Management
+
+```bash
+# Check hook installation status
+claude-mem status
+
+# View hook execution logs
+claude-mem logs
+
+# Uninstall hooks
+claude-mem uninstall
+```
+
+## Troubleshooting Hooks
+
+### Common Issues
+
+#### Hook Not Executing
+1. **Check file permissions**:
+   ```bash
+   chmod +x ~/.claude-mem/hooks/*.js
+   ```
+
+2. **Verify paths in settings**:
+   ```bash
+   cat ~/.claude/.claude/settings.json | jq .hooks
+   ```
+
+3. **Test hook manually**:
+   ```bash
+   echo '{"session_id":"test","transcript_path":"/tmp/test","hook_event_name":"SessionStart"}' | ~/.claude-mem/hooks/session-start.js
+   ```
+
+#### Timeout Issues
+- Increase timeout values in hook configuration
+- Check for blocking operations in custom hooks
+- Verify system performance
+
+#### Context Not Loading
+1. **Check project name detection**:
+   ```bash
+   claude-mem status
+   ```
+
+2. **Verify memory existence**:
+   ```bash
+   claude-mem load-context --project your-project
+   ```
+
+3. **Enable debug logging**:
+   ```bash
+   export CLAUDE_MEM_DEBUG=true
+   ```
+
+### Debug Mode
+
+Enable comprehensive debugging:
+
+```bash
+# Environment variable method
+export CLAUDE_MEM_DEBUG=true
+
+# Or in hook configuration
+{
+  "hooks": {
+    "SessionStart": [{
+      "hooks": [{
+        "type": "command",
+        "command": "/path/to/hook.js",
+        "env": {
+          "CLAUDE_MEM_DEBUG": "true"
+        }
+      }]
+    }]
+  }
+}
+```
+
+## Performance Optimization
+
+### Reducing Hook Latency
+
+1. **Optimize compression settings**:
+   ```json
+   {
+     "autoCompress": false,  // Manual compression only
+     "embedded": true       // Use embedded Chroma
+   }
+   ```
+
+2. **Limit context loading**:
+   ```bash
+   # In custom session-start hook
+   claude-mem load-context --limit 10 --format brief
+   ```
+
+3. **Async operations**:
+   ```javascript
+   // Don't wait for non-critical operations
+   executeCliCommand('claude-mem', ['compress']).catch(() => {});
+   ```
+
+### Memory Management
+
+- Hooks run in separate processes
+- Large context data is streamed, not held in memory
+- Cleanup temporary files in custom hooks
+
+## Security Considerations
+
+### File Permissions
+```bash
+# Secure hook files
+chmod 700 ~/.claude-mem/hooks/
+chmod 600 ~/.claude-mem/hooks/*.js
+```
+
+### Path Validation
+- Always use absolute paths in hook configuration
+- Validate file paths in custom hooks
+- Avoid user input in command execution
+
+### Environment Isolation
+- Hooks inherit environment variables
+- Sensitive data should use secure storage
+- Consider using environment-specific configurations
+
+## Migration Guide
+
+### Upgrading Hook Configuration
+
+When upgrading claude-mem versions:
+
+1. **Backup current configuration**:
+   ```bash
+   cp ~/.claude/.claude/settings.json ~/.claude/.claude/settings.json.backup
+   ```
+
+2. **Run installation**:
+   ```bash
+   claude-mem install --force
+   ```
+
+3. **Restore custom modifications** if needed
+
+### Version Compatibility
+
+- **v3.6.x**: Current hook format (no changes required)
+- **v3.5.x**: Compatible with current hooks
+- **v3.4.x and earlier**: Requires reinstallation
+
+## Related Documentation
+
+- [Settings Configuration](/configuration/settings) - Main settings file
+- [Claude Integration](/configuration/claude-integration) - Integration details
+- [CLI Reference](/cli/install) - Installation commands
+- [Troubleshooting](/guides/troubleshooting) - Common issues

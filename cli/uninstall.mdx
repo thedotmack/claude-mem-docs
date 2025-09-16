@@ -1,0 +1,432 @@
+---
+title: 'uninstall'
+description: 'Remove claude-mem integration from Claude Code'
+---
+
+# claude-mem uninstall
+
+Removes claude-mem hooks from Claude Code settings while preserving your memory data and compressed transcripts.
+
+## Synopsis
+
+```bash
+claude-mem uninstall [options]
+```
+
+## Description
+
+The `uninstall` command safely removes claude-mem integration:
+
+1. **Hook Removal** - Removes all three hook types from settings
+2. **Settings Backup** - Creates backup before modification
+3. **Data Preservation** - Keeps all memories and archives intact
+4. **Multiple Locations** - Handles both global and project settings
+
+<Note>
+Uninstalling removes the integration but preserves all your compressed transcripts and memory data. You can reinstall at any time without losing data.
+</Note>
+
+## Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--all` | Remove from both global and project settings | `false` |
+| `--project` | Remove only from project settings | `false` |
+
+## Examples
+
+### Basic Uninstall
+
+Remove from global settings:
+
+```bash
+claude-mem uninstall
+```
+
+**Sample Output:**
+```
+🔄 Uninstalling Claude Memory System hooks...
+
+✅ Removed PreCompact hook from User settings
+✅ Removed SessionStart hook from User settings
+✅ Removed SessionEnd hook from User settings
+📋 Created backup: ~/.claude/claude_code_settings.json.backup.1726405815234
+✅ Updated User settings: ~/.claude/claude_code_settings.json
+
+✨ Uninstallation complete!
+The Claude Memory System hooks have been removed from your settings.
+
+Note: Your compressed transcripts and archives are preserved.
+To reinstall: claude-mem install
+```
+
+### Project-Only Uninstall
+
+Remove only from current project:
+
+```bash
+claude-mem uninstall --project
+```
+
+Removes hooks from `./.claude/settings.json` while leaving global settings intact.
+
+### Complete Uninstall
+
+Remove from all locations:
+
+```bash
+claude-mem uninstall --all
+```
+
+**Sample Output:**
+```
+🔄 Uninstalling Claude Memory System hooks...
+
+✅ Removed PreCompact hook from User settings
+✅ Removed SessionStart hook from User settings
+✅ Removed SessionEnd hook from User settings
+📋 Created backup: ~/.claude/claude_code_settings.json.backup.1726405815234
+✅ Updated User settings: ~/.claude/claude_code_settings.json
+
+⏭️  No hooks configured in Project settings
+
+✨ Uninstallation complete!
+The Claude Memory System hooks have been removed from your settings.
+
+Note: Your compressed transcripts and archives are preserved.
+To reinstall: claude-mem install
+```
+
+## What Gets Removed
+
+### Hook Types
+
+The command removes all three hook types:
+
+#### PreCompact Hooks
+Triggered before `/compact` command:
+```json
+"PreCompact": [
+  {
+    "patterns": ["**"],
+    "hooks": [
+      {
+        "command": "~/.claude-mem/hooks/pre-compact.js"
+      }
+    ]
+  }
+]
+```
+
+#### SessionStart Hooks
+Triggered at session startup:
+```json
+"SessionStart": [
+  {
+    "patterns": ["**"],
+    "hooks": [
+      {
+        "command": "~/.claude-mem/hooks/session-start.js"
+      }
+    ]
+  }
+]
+```
+
+#### SessionEnd Hooks
+Triggered at session end:
+```json
+"SessionEnd": [
+  {
+    "patterns": ["**"],
+    "hooks": [
+      {
+        "command": "~/.claude-mem/hooks/session-end.js"
+      }
+    ]
+  }
+]
+```
+
+### Settings Locations
+
+The command can target different settings files:
+
+| Target | File Location | Command |
+|--------|---------------|---------|
+| **Global** | `~/.claude/claude_code_settings.json` | `uninstall` |
+| **Project** | `./.claude/settings.json` | `uninstall --project` |
+| **Both** | Both files | `uninstall --all` |
+
+## Safety Features
+
+### Automatic Backups
+
+Before modifying any settings file, a timestamped backup is created:
+
+```
+~/.claude/claude_code_settings.json.backup.1726405815234
+./.claude/settings.json.backup.1726405815234
+```
+
+**Backup Format:**
+- Original filename + `.backup.` + Unix timestamp
+- Contains exact copy of original settings
+- Can be manually restored if needed
+
+### Data Preservation
+
+Uninstalling preserves all your data:
+
+```
+~/.claude-mem/
+├── index/              # Chroma database - PRESERVED
+├── archives/           # Compressed transcripts - PRESERVED
+├── hooks/              # Hook scripts - PRESERVED
+├── trash/              # Deleted items - PRESERVED
+├── logs/               # Activity logs - PRESERVED
+└── settings.json       # Configuration - PRESERVED
+```
+
+Only the hook registrations in Claude Code settings are removed.
+
+### Hook Detection
+
+The command intelligently detects claude-mem hooks by looking for:
+
+- **Exact path matches** - Direct hook script paths
+- **Filename patterns** - Scripts containing `pre-compact.js`, `session-start.js`, `session-end.js`
+- **Command patterns** - Commands containing `claude-mem`
+
+This ensures only claude-mem hooks are removed, leaving other hooks intact.
+
+## Selective Removal
+
+### Filtering Other Hooks
+
+If your settings contain multiple hooks:
+
+```json
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "patterns": ["**"],
+        "hooks": [
+          {
+            "command": "~/.claude-mem/hooks/pre-compact.js"
+          },
+          {
+            "command": "/path/to/other-hook.js"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**After uninstall:**
+```json
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "patterns": ["**"],
+        "hooks": [
+          {
+            "command": "/path/to/other-hook.js"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Only claude-mem hooks are removed; other hooks remain.
+
+### Clean-up Behavior
+
+The command performs thorough cleanup:
+
+1. **Remove claude-mem hooks** from hook arrays
+2. **Remove empty arrays** if no hooks remain
+3. **Remove empty hook types** if all arrays are empty
+4. **Remove hooks section** if no hook types remain
+
+## Status Messages
+
+### Success Cases
+
+#### Hooks Found and Removed
+```
+✅ Removed PreCompact hook from User settings
+✅ Removed SessionStart hook from User settings
+✅ Removed SessionEnd hook from User settings
+```
+
+#### No Hooks Found
+```
+ℹ️  No Claude Memory System hooks found in User settings
+```
+
+#### Settings File Missing
+```
+⏭️  No settings found at User location
+```
+
+### Error Cases
+
+#### Permission Issues
+```
+⚠️  Could not process User settings: Permission denied
+```
+
+#### Corrupted Settings
+```
+⚠️  Could not process User settings: Invalid JSON
+```
+
+## Post-Uninstall
+
+### Immediate Effects
+
+After uninstalling:
+
+1. **New sessions** won't load claude-mem context automatically
+2. **`/compact` command** won't trigger memory compression
+3. **Session end** won't save context automatically
+4. **Claude Code functions normally** without claude-mem features
+
+### Data Access
+
+Your data remains accessible:
+
+```bash
+# View preserved memories
+claude-mem load-context
+
+# Check system status
+claude-mem status
+
+# View logs
+claude-mem logs
+
+# Restore files
+claude-mem restore
+```
+
+### Reinstallation
+
+Reinstall at any time:
+
+```bash
+# Quick reinstall
+claude-mem install
+
+# Force reinstall over existing
+claude-mem install --force
+```
+
+All your preserved data will be immediately available.
+
+## Troubleshooting
+
+### Permission Denied
+
+If uninstall fails due to permissions:
+
+```bash
+# Check file permissions
+ls -la ~/.claude/claude_code_settings.json
+
+# Fix permissions if needed
+chmod 644 ~/.claude/claude_code_settings.json
+
+# Retry uninstall
+claude-mem uninstall
+```
+
+### Backup Restoration
+
+To restore a backup manually:
+
+```bash
+# Find backup files
+ls ~/.claude/*.backup.*
+
+# Restore specific backup
+cp ~/.claude/claude_code_settings.json.backup.1726405815234 \
+   ~/.claude/claude_code_settings.json
+```
+
+### Incomplete Uninstall
+
+If some hooks remain:
+
+```bash
+# Check current status
+claude-mem status
+
+# Force complete removal
+claude-mem uninstall --all
+
+# Manual cleanup if needed
+# Edit settings files directly
+```
+
+### Settings Corruption
+
+If settings become corrupted:
+
+```bash
+# Restore from backup
+cp ~/.claude/claude_code_settings.json.backup.1726405815234 \
+   ~/.claude/claude_code_settings.json
+
+# Or reinstall clean
+mv ~/.claude/claude_code_settings.json \
+   ~/.claude/claude_code_settings.json.old
+claude-mem install
+```
+
+## Verification
+
+### Confirm Uninstall
+
+After uninstalling, verify removal:
+
+```bash
+# Check system status
+claude-mem status
+
+# Should show: "❌ Claude Memory System is not installed"
+```
+
+### Test Claude Code
+
+1. **Restart Claude Code** completely
+2. **Start new session** - No automatic context loading
+3. **Try `/compact`** - Should work but no memory compression
+4. **Check session end** - No automatic context saving
+
+## Related Commands
+
+<CardGrid cols={3}>
+  <Card title="install" icon="download" href="/cli/install">
+    Reinstall claude-mem
+  </Card>
+  <Card title="status" icon="heart-pulse" href="/cli/status">
+    Verify removal
+  </Card>
+  <Card title="load-context" icon="brain" href="/cli/load-context">
+    Access preserved data
+  </Card>
+</CardGrid>
+
+## See Also
+
+- [`install`](/cli/install) - Initial setup and reinstallation
+- [`status`](/cli/status) - Verify uninstall completion
+- [Installation Guide](/installation) - Complete setup process

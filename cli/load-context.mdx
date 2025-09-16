@@ -1,0 +1,326 @@
+---
+title: 'load-context'
+description: 'Preview and load available memories from your context index'
+---
+
+# claude-mem load-context
+
+Loads and displays recent memories, overviews, and sessions from your context index with flexible filtering and formatting options.
+
+## Synopsis
+
+```bash
+claude-mem load-context [options]
+```
+
+## Description
+
+The `load-context` command retrieves and displays your stored memories in various formats:
+
+1. **Recent Memories** - Last 10 memory entries
+2. **Project Overviews** - Last 3-5 overview summaries
+3. **Session Context** - Session-specific formatting
+4. **Trash Status** - Shows deleted items needing attention
+
+## Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--project <name>` | Filter by specific project | All projects |
+| `--format <type>` | Output format: `default`, `json`, `session-start` | `default` |
+| `--limit <number>` | Maximum items to display | varies by type |
+
+## Examples
+
+### View Recent Memories
+
+```bash
+claude-mem load-context
+```
+
+**Sample Output:**
+```
+✅ Context loading completed (13 recent entries found)
+
+Implemented user authentication system | auth-feature-2025 | authentication, login, security
+Added database migrations for user table | db-migration-001 | database, users, schema
+Fixed memory compression bug | bugfix-compression | compression, memory, bug
+**Overview:** Completed Phase 1 of user management system including auth,
+database setup, and initial UI components. Ready for Phase 2 testing.
+
+🗑️  Trash – 2 folders | 3 files | 1.2 MB – use `$ claude-mem restore`
+```
+
+### Project-Specific Context
+
+Filter memories for a specific project:
+
+```bash
+claude-mem load-context --project "my-app"
+```
+
+Only shows memories tagged with the specified project name.
+
+### JSON Output
+
+Machine-readable format for scripting:
+
+```bash
+claude-mem load-context --format json
+```
+
+**Sample Output:**
+```json
+[
+  {
+    "type": "memory",
+    "text": "Implemented user authentication system",
+    "document_id": "auth-feature-2025",
+    "keywords": "authentication, login, security",
+    "timestamp": "2025-09-15T10:30:00.000Z",
+    "project": "my-app"
+  },
+  {
+    "type": "overview",
+    "content": "Completed Phase 1 of user management system",
+    "timestamp": "2025-09-15T09:15:00.000Z",
+    "project": "my-app"
+  }
+]
+```
+
+### Session Start Format
+
+Special formatting for Claude Code session initialization:
+
+```bash
+claude-mem load-context --format session-start --project "my-app"
+```
+
+Provides contextual display optimized for loading into new Claude sessions.
+
+## Output Types
+
+### Memory Entries
+
+Individual memories from your development sessions:
+
+```
+Implemented user authentication system | auth-feature-2025 | authentication, login, security
+```
+
+Format: `<description> | <document-id> | <keywords>`
+
+### Overview Summaries
+
+High-level project summaries:
+
+```
+**Overview:** Completed Phase 1 of user management system including auth,
+database setup, and initial UI components. Ready for Phase 2 testing.
+```
+
+Prefixed with `**Overview:**` to distinguish from regular memories.
+
+### Trash Status
+
+Shows deleted items requiring attention:
+
+```
+🗑️  Trash – 2 folders | 3 files | 1.2 MB – use `$ claude-mem restore`
+```
+
+Only appears when trash contains items (hidden in JSON format).
+
+## Filtering
+
+### By Project
+
+Use `--project` to filter memories:
+
+```bash
+# Show only memories for "web-app" project
+claude-mem load-context --project "web-app"
+
+# Show only memories for current project
+claude-mem load-context --project "$(basename $(pwd))"
+```
+
+### By Recency
+
+The command automatically shows the most recent items:
+
+- **Memories:** Last 10 entries
+- **Overviews:** Last 3-5 entries
+- **Combined:** Mixed recent items for session-start format
+
+## Error Handling
+
+### No Memories Found
+
+```bash
+claude-mem load-context --project "nonexistent"
+```
+
+Returns silently when no memories exist for the specified criteria.
+
+### Permission Issues
+
+```
+❌ Context loading failed: Permission denied
+💡 Check file permissions and try again
+```
+
+### Corrupted Index
+
+```
+❌ Context loading failed: Invalid JSON in index file
+💡 Check file permissions and try again
+```
+
+## Use Cases
+
+### Development Workflow
+
+Load context at start of coding session:
+
+```bash
+# Quick overview of recent work
+claude-mem load-context
+
+# Project-specific context
+claude-mem load-context --project "$(basename $(pwd))"
+```
+
+### Automation & Scripting
+
+Export memories for external processing:
+
+```bash
+# Export to file
+claude-mem load-context --format json > memories.json
+
+# Count memories
+claude-mem load-context --format json | jq length
+
+# Extract keywords
+claude-mem load-context --format json | jq -r '.[].keywords' | sort -u
+```
+
+### Session Management
+
+Prepare context for Claude Code:
+
+```bash
+# Generate session context
+claude-mem load-context --format session-start --project "my-project"
+```
+
+## File Locations
+
+The command reads from these locations:
+
+| File | Purpose |
+|------|---------|
+| `~/.claude-mem/index.jsonl` | Main memory index |
+| `~/.claude-mem/trash/` | Deleted items directory |
+
+<Note>
+The index file uses JSONL format where each line is a separate JSON object representing a memory, overview, or session.
+</Note>
+
+## Integration
+
+### With Claude Code
+
+claude-mem automatically calls `load-context` during:
+
+- **Session Start** - Loads recent context
+- **Project Switch** - Filters by project
+- **Manual Trigger** - Via `/load-context` command
+
+### With Shell Scripts
+
+Common patterns for shell integration:
+
+```bash
+#!/bin/bash
+
+# Load context and check for work
+if claude-mem load-context --format json | jq -e 'length > 0' > /dev/null; then
+    echo "Previous work found, loading context..."
+    claude-mem load-context
+else
+    echo "Starting fresh project"
+fi
+```
+
+## Performance
+
+### Large Indexes
+
+For projects with many memories:
+
+- Command shows only recent items (not all entries)
+- JSON format includes same recent subset
+- Full index available via direct file access
+
+### Network Independence
+
+- Fully offline operation
+- No external API calls
+- Instant response from local files
+
+## Troubleshooting
+
+### Empty Output
+
+1. **No memories exist yet**
+   ```bash
+   # Create first memory by using /compact in Claude Code
+   ```
+
+2. **Wrong project filter**
+   ```bash
+   # Check available projects
+   claude-mem load-context --format json | jq -r '.[].project' | sort -u
+   ```
+
+3. **Corrupted index**
+   ```bash
+   # Check index file
+   head ~/.claude-mem/index.jsonl
+   ```
+
+### Performance Issues
+
+For very large index files:
+
+```bash
+# Check index size
+ls -lh ~/.claude-mem/index.jsonl
+
+# If very large, consider archiving old entries
+claude-mem compress --archive-old
+```
+
+## See Also
+
+<CardGrid cols={3}>
+  <Card title="status" icon="heart-pulse" href="/cli/status">
+    Check system health
+  </Card>
+  <Card title="trash-view" icon="trash" href="/cli/trash-view">
+    View deleted items
+  </Card>
+  <Card title="restore" icon="rotate-left" href="/cli/restore">
+    Recover deleted memories
+  </Card>
+</CardGrid>
+
+## Related Commands
+
+- [`status`](/cli/status) - Verify system health
+- [`trash-view`](/cli/trash-view) - View deleted items
+- [`restore`](/cli/restore) - Recover from trash
+- [Memory Compression](/concepts/memory-compression) - How memories are created

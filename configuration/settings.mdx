@@ -1,0 +1,313 @@
+---
+title: "Settings Configuration"
+description: "Configure claude-mem behavior with settings.json file"
+---
+
+## Overview
+
+Claude-mem uses a `settings.json` file located in `~/.claude-mem/settings.json` to configure its behavior. This file controls various aspects of memory compression, project settings, and integration features.
+
+## Settings File Location
+
+The settings file is automatically created when you first run `claude-mem install`. It's located at:
+
+```
+~/.claude-mem/settings.json
+```
+
+## Available Settings
+
+<Tabs>
+  <Tab title="Complete Example">
+    ```json
+    {
+      "autoCompress": true,
+      "projectName": "my-project",
+      "installed": true,
+      "backend": "chroma",
+      "embedded": true,
+      "saveMemoriesOnClear": true,
+      "claudePath": "claude"
+    }
+    ```
+  </Tab>
+  <Tab title="Minimal Example">
+    ```json
+    {
+      "installed": true
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Setting Details
+
+### Core Settings
+
+#### `autoCompress`
+- **Type**: `boolean`
+- **Default**: `false`
+- **Description**: Automatically compress transcripts when Claude Code sessions end
+- **Example**:
+  ```json
+  {
+    "autoCompress": true
+  }
+  ```
+
+#### `projectName`
+- **Type**: `string`
+- **Default**: Auto-detected from current directory
+- **Description**: Override the project name used for memory organization
+- **Example**:
+  ```json
+  {
+    "projectName": "my-awesome-project"
+  }
+  ```
+
+#### `installed`
+- **Type**: `boolean`
+- **Default**: `false`
+- **Description**: Tracks whether claude-mem hooks are properly installed
+- **Note**: This is automatically managed by the installation process
+
+### Backend Configuration
+
+#### `backend`
+- **Type**: `string`
+- **Default**: `"chroma"`
+- **Description**: Vector database backend for memory storage
+- **Options**: `"chroma"` (only supported option currently)
+- **Example**:
+  ```json
+  {
+    "backend": "chroma"
+  }
+  ```
+
+#### `embedded`
+- **Type**: `boolean`
+- **Default**: `true`
+- **Description**: Use embedded Chroma database vs. external server
+- **Example**:
+  ```json
+  {
+    "embedded": true
+  }
+  ```
+
+### Memory Management
+
+#### `saveMemoriesOnClear`
+- **Type**: `boolean`
+- **Default**: `true`
+- **Description**: Preserve memories when clearing transcript data
+- **Example**:
+  ```json
+  {
+    "saveMemoriesOnClear": true
+  }
+  ```
+
+### Integration Settings
+
+#### `claudePath`
+- **Type**: `string`
+- **Default**: `"claude"`
+- **Description**: Path to the Claude Code CLI executable
+- **Use Cases**:
+  - Custom installation paths
+  - Multiple Claude versions
+  - Debugging with specific builds
+- **Example**:
+  ```json
+  {
+    "claudePath": "/usr/local/bin/claude"
+  }
+  ```
+
+## Configuration Best Practices
+
+### Project-Specific Settings
+
+While settings are global by default, you can create project-specific configurations:
+
+1. **Global settings** in `~/.claude-mem/settings.json`
+2. **Project overrides** detected from environment and context
+
+### Development vs Production
+
+<Tabs>
+  <Tab title="Development">
+    ```json
+    {
+      "autoCompress": false,
+      "saveMemoriesOnClear": true,
+      "embedded": true
+    }
+    ```
+  </Tab>
+  <Tab title="Production">
+    ```json
+    {
+      "autoCompress": true,
+      "saveMemoriesOnClear": true,
+      "embedded": true
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Managing Settings
+
+### Reading Settings Programmatically
+
+Claude-mem provides utilities to read settings:
+
+```typescript
+import { readSettings, getSetting } from 'claude-mem/settings';
+
+// Read all settings
+const settings = readSettings();
+
+// Get specific setting with fallback
+const claudePath = getSetting('claudePath', 'claude');
+```
+
+### Updating Settings
+
+Settings are automatically updated by claude-mem commands, but you can manually edit the JSON file:
+
+```bash
+# Edit settings file
+nano ~/.claude-mem/settings.json
+
+# Verify settings
+claude-mem status
+```
+
+## Troubleshooting
+
+### Settings Not Loading
+
+If settings aren't being read properly:
+
+1. **Check file permissions**:
+   ```bash
+   ls -la ~/.claude-mem/settings.json
+   ```
+
+2. **Validate JSON syntax**:
+   ```bash
+   cat ~/.claude-mem/settings.json | jq .
+   ```
+
+3. **Reset to defaults**:
+   ```bash
+   claude-mem install --force
+   ```
+
+### Common Issues
+
+#### Invalid JSON Format
+```json
+{
+  "autoCompress": true,  // ❌ Comments not allowed
+  "projectName": "test"  // ❌ Trailing comma
+}
+```
+
+Should be:
+```json
+{
+  "autoCompress": true,
+  "projectName": "test"
+}
+```
+
+#### Path Resolution
+For `claudePath`, use absolute paths or ensure the binary is in your PATH:
+
+```json
+{
+  "claudePath": "/usr/local/bin/claude"
+}
+```
+
+## Migration Guide
+
+### From v3.5.x to v3.6.x
+
+No breaking changes in settings format. New settings added with defaults:
+
+- `saveMemoriesOnClear`: Default `true`
+- Enhanced `projectName` auto-detection
+
+### Upgrading Settings
+
+When upgrading claude-mem versions:
+
+1. **Backup current settings**:
+   ```bash
+   cp ~/.claude-mem/settings.json ~/.claude-mem/settings.json.backup
+   ```
+
+2. **Run installation**:
+   ```bash
+   claude-mem install --force
+   ```
+
+3. **Restore custom settings** if needed
+
+## Advanced Configuration
+
+### Environment Variable Overrides
+
+Some settings can be overridden with environment variables:
+
+```bash
+# Override Claude path
+export CLAUDE_MEM_CLAUDE_PATH="/custom/path/claude"
+
+# Override project name
+export CLAUDE_MEM_PROJECT_NAME="custom-project"
+```
+
+### Custom Backend Configuration
+
+Future versions will support additional backend options. Current structure:
+
+```json
+{
+  "backend": "chroma",
+  "backendConfig": {
+    "host": "localhost",
+    "port": 8000,
+    "embedded": true
+  }
+}
+```
+
+## Security Considerations
+
+### File Permissions
+
+Ensure proper permissions on the settings file:
+
+```bash
+chmod 600 ~/.claude-mem/settings.json
+```
+
+### Sensitive Data
+
+Avoid storing sensitive information in settings:
+- Use environment variables for secrets
+- Keep paths relative when possible
+- Use secure defaults
+
+## Related Documentation
+
+- [Installation Guide](/installation) - Setting up claude-mem
+- [Hook Configuration](/configuration/hooks) - Customizing hooks
+- [CLI Reference](/cli/status) - Managing settings via CLI

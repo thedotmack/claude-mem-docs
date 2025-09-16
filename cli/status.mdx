@@ -1,0 +1,221 @@
+---
+title: 'status'
+description: 'Check claude-mem system health and configuration'
+---
+
+# claude-mem status
+
+Performs a comprehensive health check of the claude-mem installation, verifying hooks, settings, storage, and runtime environment.
+
+## Synopsis
+
+```bash
+claude-mem status
+```
+
+## Description
+
+The `status` command provides a detailed report of your claude-mem installation:
+
+1. **Hook Scripts** - Verifies installed hook files
+2. **Settings Configuration** - Checks Claude Code hook registration
+3. **Compressed Transcripts** - Shows archived content statistics
+4. **Runtime Environment** - Validates Node.js/Bun availability
+5. **Chroma Storage** - Confirms storage backend status
+6. **Installation Summary** - Overall system health
+
+## Examples
+
+### Basic Health Check
+
+```bash
+claude-mem status
+```
+
+**Sample Output:**
+```
+🔍 Claude Memory System Status Check
+=====================================
+
+📂 Installed Hook Scripts:
+  ✅ pre-compact.js: Found at ~/.claude-mem/hooks/pre-compact.js
+  ✅ session-start.js: Found at ~/.claude-mem/hooks/session-start.js
+  ✅ session-end.js: Found at ~/.claude-mem/hooks/session-end.js
+
+⚙️  Settings Configuration:
+  📋 Global: ~/.claude/claude_code_settings.json
+     PreCompact: ✅
+     SessionStart: ✅
+     SessionEnd: ✅
+
+📦 Compressed Transcripts:
+  Compressed files: 15
+  Archive files: 3
+
+🔧 Runtime Environment:
+  ✅ Node.js: v20.10.0
+  ✅ Bun: 1.0.25
+
+🧠 Chroma Storage Status:
+  ✅ Storage backend: Chroma MCP
+  📍 Data location: ~/.claude-mem/index
+  🔍 Features: Vector search, semantic similarity, document storage
+
+📊 Summary:
+  ✅ Claude Memory System is installed (Global)
+
+💡 To test: Use /compact in Claude Code
+```
+
+## Status Components
+
+### Hook Scripts
+
+Verifies the presence of three core hook files:
+
+- **pre-compact.js** - Handles memory compression before `/compact`
+- **session-start.js** - Loads context at session startup
+- **session-end.js** - Saves context when sessions end
+
+<Note>
+Hook files must exist in `~/.claude-mem/hooks/` and have executable permissions
+</Note>
+
+### Settings Configuration
+
+Checks hook registration in Claude Code settings:
+
+- **Global Settings** - `~/.claude/claude_code_settings.json`
+- **Project Settings** - `./.claude/settings.json` (if present)
+
+Each hook type is verified:
+- ✅ Registered and active
+- ❌ Missing or misconfigured
+
+### Compressed Transcripts
+
+Scans for archived conversation data:
+
+- **Compressed files** - `.jsonl.compressed` format
+- **Archive files** - `.jsonl.archive` format
+- **Location** - Claude projects directory
+
+### Runtime Environment
+
+Validates required runtime dependencies:
+
+- **Node.js** - Required for claude-mem execution
+- **Bun** - Alternative runtime (if available)
+
+<Warning>
+At least Node.js is required. Missing runtime will prevent claude-mem from functioning.
+</Warning>
+
+### Chroma Storage
+
+Confirms vector database configuration:
+
+- **Backend** - Chroma MCP server
+- **Location** - Data directory path
+- **Features** - Available search capabilities
+
+## Installation States
+
+The status command can report several installation states:
+
+### ✅ Healthy Installation
+
+```
+✅ Claude Memory System is installed (Global)
+💡 To test: Use /compact in Claude Code
+```
+
+All components are properly configured and functional.
+
+### ❌ Not Installed
+
+```
+❌ Claude Memory System is not installed
+💡 To install: claude-mem install
+```
+
+No hooks are registered in Claude Code settings.
+
+### ⚠️ Partial Installation
+
+Some hooks may be missing or misconfigured:
+
+```
+⚙️  Settings Configuration:
+  📋 Global: ~/.claude/claude_code_settings.json
+     PreCompact: ✅
+     SessionStart: ❌
+     SessionEnd: ✅
+```
+
+## Troubleshooting
+
+### Missing Hook Files
+
+If hook scripts are not found:
+
+```bash
+# Reinstall hooks
+claude-mem install --force
+```
+
+### Settings Not Updated
+
+If hooks aren't registered in Claude Code:
+
+1. Check file permissions
+2. Restart Claude Code completely
+3. Run `claude-mem install --force`
+
+### No Compressed Files
+
+If no archived transcripts are found:
+
+- Normal for new installations
+- Files appear after using `/compact` command
+- Check projects directory permissions
+
+### Runtime Issues
+
+If Node.js/Bun are missing:
+
+```bash
+# Install Node.js
+# Visit: https://nodejs.org
+
+# Or install Bun
+curl -fsSL https://bun.sh/install | bash
+```
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Status check completed successfully |
+| `1` | Error reading configuration files |
+| `2` | Permission denied accessing directories |
+
+## Related Commands
+
+<CardGrid cols={3}>
+  <Card title="install" icon="download" href="/cli/install">
+    Set up claude-mem
+  </Card>
+  <Card title="uninstall" icon="times" href="/cli/uninstall">
+    Remove claude-mem
+  </Card>
+  <Card title="logs" icon="scroll" href="/cli/logs">
+    View system logs
+  </Card>
+</CardGrid>
+
+## See Also
+
+- [`install`](/cli/install) - Initial setup
+- [`uninstall`](/cli/uninstall) - Remove integration
+- [Installation Guide](/installation) - Setup walkthrough

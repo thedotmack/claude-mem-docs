@@ -1,0 +1,390 @@
+---
+title: 'logs'
+description: 'View claude-mem activity logs and troubleshoot issues'
+---
+
+# claude-mem logs
+
+Displays activity logs from claude-mem operations, helping you monitor system behavior and troubleshoot issues.
+
+## Synopsis
+
+```bash
+claude-mem logs [options]
+```
+
+## Description
+
+The `logs` command shows recent activity from claude-mem operations:
+
+1. **Most Recent Log** - Displays the latest log file by default
+2. **Configurable Output** - Control number of lines shown
+3. **Multiple Files** - Access to all available log files
+4. **Real-time Following** - Watch logs as they update
+
+## Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--tail <number>` | Number of recent lines to show | `20` |
+| `--all` | Show information about all log files | `false` |
+| `--follow` | Follow logs in real-time | `false` |
+
+## Examples
+
+### View Recent Activity
+
+```bash
+claude-mem logs
+```
+
+**Sample Output:**
+```
+📋 Most Recent Logs (last 20 lines):
+   File: ~/.claude-mem/logs/claude-mem-2025-09-15.log
+
+   2025-09-15T10:30:15.234Z [INFO] Session start: Loading context
+   2025-09-15T10:30:15.245Z [INFO] Found 12 memories for project 'my-app'
+   2025-09-15T10:30:15.250Z [INFO] Context loaded successfully
+   2025-09-15T10:45:22.123Z [INFO] Pre-compact hook triggered
+   2025-09-15T10:45:22.145Z [INFO] Starting compression for session abc123
+   2025-09-15T10:45:23.456Z [INFO] Compression completed: 45 messages → 3 memories
+   2025-09-15T10:45:23.467Z [INFO] Saved to index: 3 new entries
+   2025-09-15T11:15:30.789Z [WARN] Trash directory size: 1.2MB (cleanup recommended)
+   2025-09-15T11:30:45.012Z [INFO] Session end: Context saved
+```
+
+### Show More Lines
+
+Display more log history:
+
+```bash
+claude-mem logs --tail 50
+```
+
+Shows the last 50 lines instead of the default 20.
+
+### View All Log Files
+
+See information about all available logs:
+
+```bash
+claude-mem logs --all
+```
+
+**Sample Output:**
+```
+📋 Most Recent Logs (last 20 lines):
+   File: ~/.claude-mem/logs/claude-mem-2025-09-15.log
+
+   [log entries...]
+
+📚 Found 5 total log files
+```
+
+Lists the total count of available log files.
+
+### Follow Logs in Real-Time
+
+Monitor ongoing activity:
+
+```bash
+claude-mem logs --follow
+```
+
+**Sample Output:**
+```
+📋 Most Recent Logs (last 20 lines):
+   File: ~/.claude-mem/logs/claude-mem-2025-09-15.log
+
+   [existing log entries...]
+
+Following logs... (Press Ctrl+C to stop)
+   2025-09-15T11:45:12.345Z [INFO] New session started
+   2025-09-15T11:45:12.356Z [INFO] Loading context for project 'web-app'
+```
+
+<Note>
+Press Ctrl+C to stop following logs and return to the command prompt.
+</Note>
+
+## Log Levels
+
+claude-mem uses standard log levels:
+
+### INFO
+Normal operational messages:
+```
+2025-09-15T10:30:15.234Z [INFO] Session start: Loading context
+2025-09-15T10:45:22.145Z [INFO] Starting compression for session abc123
+```
+
+### WARN
+Warning conditions that don't prevent operation:
+```
+2025-09-15T11:15:30.789Z [WARN] Trash directory size: 1.2MB (cleanup recommended)
+2025-09-15T11:20:15.456Z [WARN] Large session detected: 500+ messages
+```
+
+### ERROR
+Error conditions that may affect functionality:
+```
+2025-09-15T12:00:45.123Z [ERROR] Failed to write memory to index
+2025-09-15T12:15:30.789Z [ERROR] Permission denied accessing settings file
+```
+
+## Log File Organization
+
+### File Naming
+
+Log files use date-based naming:
+```
+~/.claude-mem/logs/
+├── claude-mem-2025-09-15.log  # Today's logs
+├── claude-mem-2025-09-14.log  # Yesterday's logs
+├── claude-mem-2025-09-13.log  # Previous days
+└── ...
+```
+
+### Rotation
+
+- **Daily rotation** - New file each day
+- **Automatic cleanup** - Old files eventually removed
+- **Size limits** - Large files may be split
+
+## Common Log Patterns
+
+### Successful Session
+
+Normal operation shows this pattern:
+```
+[INFO] Session start: Loading context
+[INFO] Found X memories for project 'name'
+[INFO] Context loaded successfully
+... (session activity) ...
+[INFO] Pre-compact hook triggered
+[INFO] Starting compression for session abc123
+[INFO] Compression completed: X messages → Y memories
+[INFO] Saved to index: Y new entries
+[INFO] Session end: Context saved
+```
+
+### Compression Issues
+
+Problems during memory compression:
+```
+[INFO] Pre-compact hook triggered
+[ERROR] Failed to read session transcript
+[WARN] Skipping compression due to error
+```
+
+### Storage Problems
+
+Issues with file system access:
+```
+[ERROR] Permission denied accessing ~/.claude-mem/index.jsonl
+[ERROR] Failed to write memory to index
+[WARN] Using fallback storage location
+```
+
+## Troubleshooting with Logs
+
+### No Log Files Found
+
+```bash
+claude-mem logs
+```
+
+**Output:**
+```
+❌ No log files found in ~/.claude-mem/logs/
+   Run a compression first to generate logs
+```
+
+**Solution:**
+1. Use `/compact` in Claude Code to trigger logging
+2. Check directory permissions for `~/.claude-mem/logs/`
+3. Verify claude-mem installation with `claude-mem status`
+
+### Permission Errors
+
+Look for permission-related log entries:
+```
+[ERROR] Permission denied accessing settings file
+[ERROR] Failed to create log directory
+```
+
+**Solutions:**
+```bash
+# Fix directory permissions
+chmod 755 ~/.claude-mem/
+chmod 755 ~/.claude-mem/logs/
+
+# Fix file permissions
+chmod 644 ~/.claude-mem/logs/*.log
+```
+
+### Compression Failures
+
+Monitor compression-related errors:
+```
+[ERROR] Failed to compress session: Invalid JSON
+[WARN] Large session detected: 500+ messages
+[ERROR] Compression timeout after 30 seconds
+```
+
+**Solutions:**
+- Check session transcript format
+- Reduce session size before compression
+- Increase timeout settings
+
+### Storage Issues
+
+Watch for storage-related problems:
+```
+[ERROR] Failed to write memory to index
+[WARN] Disk space low: 95% full
+[ERROR] Index file corrupted, using backup
+```
+
+**Solutions:**
+```bash
+# Check disk space
+df -h ~/.claude-mem/
+
+# Verify index file
+head ~/.claude-mem/index.jsonl
+
+# Clean up old archives
+claude-mem clean --old
+```
+
+## Log Analysis
+
+### Extract Specific Information
+
+Using standard Unix tools:
+
+```bash
+# Count compression events today
+claude-mem logs --tail 1000 | grep "Compression completed" | wc -l
+
+# Find all errors
+claude-mem logs --tail 1000 | grep ERROR
+
+# Check memory creation rate
+claude-mem logs --tail 1000 | grep "Saved to index" | tail -10
+```
+
+### Performance Monitoring
+
+Track system performance:
+
+```bash
+# Compression times
+claude-mem logs --tail 1000 | grep "Compression completed"
+
+# Session sizes
+claude-mem logs --tail 1000 | grep "messages →"
+
+# Error frequency
+claude-mem logs --tail 1000 | grep ERROR | wc -l
+```
+
+## Configuration
+
+### Log Levels
+
+Control logging verbosity in `~/.claude-mem/settings.json`:
+
+```json
+{
+  "logLevel": "info",
+  "logRetentionDays": 7,
+  "maxLogFileSize": "10MB"
+}
+```
+
+### Environment Variables
+
+Override log settings:
+
+```bash
+# Set log level
+export CLAUDE_MEM_LOG_LEVEL=debug
+
+# Custom log directory
+export CLAUDE_MEM_LOG_DIR=~/custom/logs
+
+# Run with custom settings
+claude-mem logs
+```
+
+## Integration
+
+### With Shell Scripts
+
+Monitor claude-mem in scripts:
+
+```bash
+#!/bin/bash
+
+# Check for recent errors
+if claude-mem logs --tail 100 | grep -q ERROR; then
+    echo "❌ Recent errors detected"
+    claude-mem logs --tail 10 | grep ERROR
+    exit 1
+fi
+
+echo "✅ No recent errors"
+```
+
+### With Monitoring Systems
+
+Export logs for external monitoring:
+
+```bash
+# Export to JSON format
+claude-mem logs --tail 1000 --format json
+
+# Send to log aggregator
+claude-mem logs --tail 100 | logger -t claude-mem
+```
+
+## Performance
+
+### Large Log Files
+
+For very active systems:
+
+```bash
+# Check log file sizes
+du -h ~/.claude-mem/logs/
+
+# Rotate logs manually
+claude-mem logs --rotate
+
+# Clean old logs
+find ~/.claude-mem/logs/ -name "*.log" -mtime +7 -delete
+```
+
+## See Also
+
+<CardGrid cols={3}>
+  <Card title="status" icon="heart-pulse" href="/cli/status">
+    System health check
+  </Card>
+  <Card title="load-context" icon="brain" href="/cli/load-context">
+    View recent memories
+  </Card>
+  <Card title="trash-view" icon="trash" href="/cli/trash-view">
+    Check deleted items
+  </Card>
+</CardGrid>
+
+## Related Commands
+
+- [`status`](/cli/status) - Overall system health
+- [`load-context`](/cli/load-context) - View recent activity
+- [Troubleshooting Guide](/troubleshooting) - Detailed problem solving
+- [Configuration](/configuration) - Log settings

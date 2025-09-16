@@ -1,0 +1,502 @@
+---
+title: "Troubleshooting Claude Memory"
+description: "Common issues, error messages, and step-by-step solutions for claude-mem problems"
+---
+
+# Troubleshooting Claude Memory
+
+When claude-mem isn't working as expected, this guide provides systematic solutions for the most common issues. Most problems can be resolved in under 2 minutes.
+
+## Quick Diagnosis
+
+Start with the status command to identify issues immediately:
+
+```bash
+claude-mem status
+```
+
+The status output reveals the exact problem:
+
+<AccordionGroup>
+  <Accordion title="🔴 Installation: Not Found">
+    **Problem**: claude-mem is not installed or not in PATH
+
+    **Solution**:
+    ```bash
+    npm install -g claude-mem
+    # If using bun:
+    bun install -g claude-mem
+    ```
+  </Accordion>
+
+  <Accordion title="🔴 Integration: Inactive">
+    **Problem**: Claude Code hooks are not installed
+
+    **Solution**:
+    ```bash
+    claude-mem install --force
+    # Then restart Claude Code completely
+    ```
+  </Accordion>
+
+  <Accordion title="🔴 Memory Index: Error">
+    **Problem**: Memory index is corrupted or inaccessible
+
+    **Solution**:
+    ```bash
+    # Check permissions
+    ls -la ~/.claude-mem/
+
+    # If permission issues:
+    sudo chown -R $USER ~/.claude-mem/
+
+    # If corruption issues, backup and reset:
+    mv ~/.claude-mem/index ~/.claude-mem/index.backup
+    ```
+  </Accordion>
+
+  <Accordion title="🔴 Storage: Permission Denied">
+    **Problem**: Cannot write to storage directory
+
+    **Solution**:
+    ```bash
+    # Fix ownership
+    sudo chown -R $USER ~/.claude-mem/
+
+    # Fix permissions
+    chmod -R 755 ~/.claude-mem/
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Common Error Messages
+
+### "No memories found" on Session Start
+
+**Symptoms**:
+- Claude Code shows "No previous memories found" message
+- `claude-mem load-context` returns empty results
+
+**Causes & Solutions**:
+
+<Steps>
+  <Step title="Check if memories exist">
+    ```bash
+    ls -la ~/.claude-mem/index/
+    # Should contain index.jsonl file
+    ```
+
+    If no index file exists, you haven't created any memories yet. Have a session with Claude Code and the memory will be created automatically.
+  </Step>
+
+  <Step title="Verify project name filtering">
+    ```bash
+    # Check what project name is being used
+    pwd  # Note your current directory name
+
+    # Load context without project filter
+    claude-mem load-context
+
+    # Load context for specific project
+    claude-mem load-context --project your-project-name
+    ```
+
+    Memory loading is filtered by project name (current directory). If your directory name changed, memories might be filtered out.
+  </Step>
+
+  <Step title="Check memory format">
+    ```bash
+    head -5 ~/.claude-mem/index/index.jsonl
+    ```
+
+    Each line should be valid JSON. If you see corruption, restore from backup:
+    ```bash
+    claude-mem restore
+    # Select index backup if available
+    ```
+  </Step>
+</Steps>
+
+### "Hook execution timeout" Errors
+
+**Symptoms**:
+- Claude Code startup hangs or shows timeout errors
+- Session end takes unusually long
+
+**Solution**:
+
+<Steps>
+  <Step title="Increase timeout">
+    ```bash
+    claude-mem install --timeout 300000  # 5 minutes
+    ```
+  </Step>
+
+  <Step title="Check for blocking processes">
+    ```bash
+    # View logs to identify what's blocking
+    claude-mem logs --error --tail 100
+    ```
+  </Step>
+
+  <Step title="Reinstall with verbose output">
+    ```bash
+    claude-mem install --force
+    # Watch for specific error messages
+    ```
+  </Step>
+</Steps>
+
+### "Cannot find claude-mem command"
+
+**Symptoms**:
+- Hook scripts fail with "command not found"
+- Works in terminal but not in Claude Code
+
+**Cause**: PATH differences between terminal and Claude Code environment
+
+**Solution**:
+
+<Steps>
+  <Step title="Find claude-mem location">
+    ```bash
+    which claude-mem
+    # Note the full path, e.g., /usr/local/bin/claude-mem
+    ```
+  </Step>
+
+  <Step title="Use explicit path installation">
+    ```bash
+    # If using npm global install:
+    claude-mem install --force
+
+    # If still failing, check npm global bin directory:
+    npm config get prefix
+    # Ensure this path is in your system PATH
+    ```
+  </Step>
+
+  <Step title="Verify hook scripts">
+    ```bash
+    # Check hook content
+    cat ~/.claude-code/hooks/session-start.sh
+    # Should contain proper path to claude-mem
+    ```
+  </Step>
+</Steps>
+
+### "Chroma database connection failed"
+
+**Symptoms**:
+- Memories aren't being saved
+- Context loading fails with database errors
+
+**Solution**:
+
+<Steps>
+  <Step title="Reset Chroma database">
+    ```bash
+    # Remove corrupted database
+    rm -rf ~/.claude-mem/chroma/
+
+    # Reinstall and recreate
+    claude-mem install --force
+    ```
+  </Step>
+
+  <Step title="Check Node.js compatibility">
+    ```bash
+    node --version
+    # Should be 18.0.0 or higher
+
+    # If older version, update Node.js
+    ```
+  </Step>
+
+  <Step title="Clear and rebuild index">
+    ```bash
+    # Backup existing data
+    cp ~/.claude-mem/index/index.jsonl ~/.claude-mem/index/index.jsonl.backup
+
+    # Remove and let it rebuild
+    rm ~/.claude-mem/index/index.jsonl
+
+    # Start a new Claude Code session to rebuild
+    ```
+  </Step>
+</Steps>
+
+## Installation Issues
+
+### Global Package Installation Problems
+
+<AccordionGroup>
+  <Accordion title="Permission Denied on Global Install">
+    **Error**: `EACCES: permission denied`
+
+    **Solution**:
+    ```bash
+    # Option 1: Use npx (recommended)
+    npx claude-mem install
+
+    # Option 2: Fix npm permissions (macOS/Linux)
+    sudo chown -R $USER /usr/local/lib/node_modules
+
+    # Option 3: Use node version manager
+    # Install nvm and use node without sudo
+    ```
+  </Accordion>
+
+  <Accordion title="Command Not Found After Install">
+    **Error**: `claude-mem: command not found`
+
+    **Solution**:
+    ```bash
+    # Check if installed
+    npm list -g claude-mem
+
+    # Find npm global bin directory
+    npm config get prefix
+    # Add to PATH: export PATH="$PATH:$(npm config get prefix)/bin"
+
+    # Or use full path
+    $(npm config get prefix)/bin/claude-mem status
+    ```
+  </Accordion>
+
+  <Accordion title="Multiple Node.js Versions Conflict">
+    **Error**: Version conflicts or installation in wrong location
+
+    **Solution**:
+    ```bash
+    # Check current node version
+    node --version
+    which node
+
+    # If using nvm, ensure correct version is active
+    nvm use node  # or specific version
+
+    # Reinstall claude-mem with correct node version
+    npm uninstall -g claude-mem
+    npm install -g claude-mem
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Claude Code Integration Issues
+
+<AccordionGroup>
+  <Accordion title="Hooks Not Triggering">
+    **Symptoms**: No memory loading messages, no compression after sessions
+
+    **Diagnosis**:
+    ```bash
+    # Check hook installation
+    ls -la ~/.claude-code/hooks/
+
+    # Should show:
+    # session-start.sh
+    # session-end.sh
+    # pre-compact.sh
+    ```
+
+    **Solution**:
+    ```bash
+    # Reinstall hooks
+    claude-mem install --force
+
+    # Verify hook permissions
+    chmod +x ~/.claude-code/hooks/*.sh
+
+    # Test hook manually
+    echo '{"source":"manual"}' | ~/.claude-code/hooks/session-start.sh
+    ```
+  </Accordion>
+
+  <Accordion title="Wrong Installation Level">
+    **Problem**: Installed at user level but need project level (or vice versa)
+
+    **Solution**:
+    ```bash
+    # Remove all installations
+    claude-mem uninstall --all
+
+    # Install at correct level
+    claude-mem install --user     # For all projects
+    claude-mem install --project  # For current project only
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Memory and Storage Issues
+
+### Disk Space Problems
+
+```bash
+# Check claude-mem storage usage
+du -sh ~/.claude-mem/
+
+# Clean up old archives (keeps last 50)
+claude-mem trash empty
+
+# Manually clean old archives if needed
+find ~/.claude-mem/archives/ -name "*.json" -mtime +30 -delete
+```
+
+### Corrupted Memory Index
+
+**Symptoms**: Load-context shows malformed data or errors
+
+**Recovery Steps**:
+
+<Steps>
+  <Step title="Backup current index">
+    ```bash
+    cp ~/.claude-mem/index/index.jsonl ~/.claude-mem/index/index.jsonl.corrupted
+    ```
+  </Step>
+
+  <Step title="Rebuild from archives">
+    ```bash
+    # Remove corrupted index
+    rm ~/.claude-mem/index/index.jsonl
+
+    # Recompress recent archives
+    find ~/.claude-mem/archives/ -name "*.json" -mtime -7 | xargs -I {} claude-mem compress "{}"
+    ```
+  </Step>
+
+  <Step title="Restore from trash if available">
+    ```bash
+    claude-mem restore
+    # Select any index backup files
+    ```
+  </Step>
+</Steps>
+
+## Performance Issues
+
+### Slow Memory Loading
+
+**Symptoms**: Claude Code takes long time to start
+
+**Solutions**:
+
+<Steps>
+  <Step title="Reduce memory count">
+    ```bash
+    # Load fewer memories (default is 10)
+    claude-mem load-context --count 5
+    ```
+
+    Edit the hook to load fewer memories permanently:
+    ```bash
+    # Edit ~/.claude-code/hooks/session-start.sh
+    # Change: --count 10
+    # To: --count 5
+    ```
+  </Step>
+
+  <Step title="Clean up old memories">
+    ```bash
+    # Check memory count
+    wc -l ~/.claude-mem/index/index.jsonl
+
+    # If > 1000 memories, consider archiving old ones
+    head -500 ~/.claude-mem/index/index.jsonl > ~/.claude-mem/index/index.jsonl.recent
+    mv ~/.claude-mem/index/index.jsonl ~/.claude-mem/index/index.jsonl.full
+    mv ~/.claude-mem/index/index.jsonl.recent ~/.claude-mem/index/index.jsonl
+    ```
+  </Step>
+</Steps>
+
+### High Memory Usage
+
+```bash
+# Check if Chroma database is consuming too much memory
+ps aux | grep chroma
+
+# Restart claude-mem to reset memory usage
+claude-mem install --force
+```
+
+## Advanced Debugging
+
+### Enable Debug Logging
+
+```bash
+# Set debug environment variable
+export CLAUDE_MEM_DEBUG=1
+
+# Run commands with verbose output
+claude-mem status
+claude-mem load-context
+
+# View detailed logs
+claude-mem logs --debug --tail 100
+```
+
+### Manual Hook Testing
+
+Test hooks independently to isolate issues:
+
+```bash
+# Test session start hook
+echo '{"source":"manual","payload":{}}' | ~/.claude-code/hooks/session-start.sh
+
+# Test session end hook (create dummy transcript first)
+echo '{"transcriptPath":"/tmp/test.json"}' | ~/.claude-code/hooks/session-end.sh
+
+# Check hook output
+echo $?  # Should be 0 for success
+```
+
+### Database Recovery
+
+If all else fails, reset the entire system:
+
+<Warning>
+  This will delete all memories. Only use as a last resort.
+</Warning>
+
+```bash
+# Backup everything
+cp -r ~/.claude-mem ~/.claude-mem.backup
+
+# Complete reset
+rm -rf ~/.claude-mem
+claude-mem install
+
+# Restore archives if needed
+cp -r ~/.claude-mem.backup/archives ~/.claude-mem/
+
+# Recompress archives to rebuild index
+find ~/.claude-mem/archives -name "*.json" | head -10 | xargs -I {} claude-mem compress "{}"
+```
+
+## Getting Help
+
+If these solutions don't resolve your issue:
+
+1. **Check Recent Changes**: Review what changed before the problem started
+2. **Collect Debug Info**: Run `claude-mem status` and `claude-mem logs --error`
+3. **Test in Clean Environment**: Try in a new directory with minimal setup
+4. **Check Version Compatibility**: Ensure Claude Code and Node.js versions are supported
+
+<Tip>
+  **Quick Reset**: Most issues are resolved by running `claude-mem install --force` and restarting Claude Code. This refreshes all components and often resolves integration problems.
+</Tip>
+
+### Support Information
+
+When seeking support, include:
+
+- Output of `claude-mem status`
+- Node.js version (`node --version`)
+- Operating system
+- Recent error logs (`claude-mem logs --error --tail 50`)
+- Steps to reproduce the issue
+
+---
+
+Remember: claude-mem is designed to "fail gracefully" - if memory loading fails, Claude Code will continue to work normally, just without the previous context.

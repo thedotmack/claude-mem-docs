@@ -1,0 +1,287 @@
+---
+title: "Getting Started with Claude Memory"
+description: "Step-by-step guide to install, configure, and start using claude-mem for persistent context across Claude Code sessions"
+---
+
+# Getting Started with Claude Memory
+
+Transform your Claude Code experience from starting fresh every time to picking up exactly where you left off. This guide will have you up and running with persistent memory in under 5 minutes.
+
+## What You'll Get
+
+<CardGrid>
+  <Card title="Persistent Context" icon="brain">
+    Claude remembers your project details, coding patterns, and decisions across sessions
+  </Card>
+  <Card title="Smart Recovery" icon="shield">
+    Safe deletion with automatic trash management and one-command restore
+  </Card>
+  <Card title="Zero Configuration" icon="rocket">
+    Works out of the box with intelligent defaults
+  </Card>
+  <Card title="Background Operation" icon="eye-slash">
+    Seamlessly integrates without interrupting your workflow
+  </Card>
+</CardGrid>
+
+## Prerequisites
+
+Before you begin, ensure you have:
+
+- **Node.js 18+** installed on your system
+- **Claude Code** CLI installed and working
+- Basic familiarity with command line operations
+
+<Steps>
+  <Step title="Install claude-mem">
+    Install the global package using npm:
+
+    ```bash
+    npm install -g claude-mem
+    ```
+
+    <Note>
+      **Using Bun?** The package also works with Bun, but npm is recommended for global installations to ensure proper CLI registration.
+    </Note>
+  </Step>
+
+  <Step title="Set Up Integration">
+    Install the Claude Code hooks with a single command:
+
+    ```bash
+    claude-mem install
+    ```
+
+    This command:
+    - Sets up session hooks in your Claude Code configuration
+    - Creates the memory directory structure at `~/.claude-mem/`
+    - Configures the Chroma vector database for semantic search
+    - Tests the integration to ensure everything works
+
+    <Warning>
+      You'll see confirmation messages for each step. If any step fails, the installer will provide specific troubleshooting guidance.
+    </Warning>
+  </Step>
+
+  <Step title="Restart Claude Code">
+    For the memory system to activate, restart Claude Code completely:
+
+    ```bash
+    # Close all Claude Code sessions and restart
+    # On macOS, you can also quit and reopen the application
+    ```
+
+    The next time you start Claude Code, you'll see a brief memory loading message.
+  </Step>
+
+  <Step title="Verify Installation">
+    Check that everything is working correctly:
+
+    ```bash
+    claude-mem status
+    ```
+
+    You should see output similar to:
+
+    ```
+    ✅ Claude Memory System Status
+
+    📦 Installation: Installed (User Level)
+    🔗 Integration: Active
+    🧠 Memory Index: Ready (0 memories)
+    🗑️  Smart Trash: Empty
+    📁 Storage: ~/.claude-mem/
+    ```
+  </Step>
+</Steps>
+
+## Your First Memory Session
+
+Now let's create your first persistent memory:
+
+<Steps>
+  <Step title="Start a Claude Code Session">
+    Open Claude Code in any project directory:
+
+    ```bash
+    cd your-project
+    claude-code
+    ```
+
+    You'll see a brief memory loading message at startup.
+  </Step>
+
+  <Step title="Have a Meaningful Conversation">
+    Discuss your project with Claude. For example:
+
+    - Explain your project structure and goals
+    - Discuss coding patterns you prefer
+    - Work through a specific problem or feature
+    - Review code architecture decisions
+
+    The more context you provide, the better Claude can remember for future sessions.
+  </Step>
+
+  <Step title="End the Session">
+    When you're done, simply exit Claude Code normally. The session will be automatically compressed into memory.
+  </Step>
+
+  <Step title="Check Your Memory">
+    View what was remembered:
+
+    ```bash
+    claude-mem load-context
+    ```
+
+    You'll see a summary of the compressed insights from your session.
+  </Step>
+
+  <Step title="Start a New Session">
+    Open Claude Code again in the same or different project:
+
+    ```bash
+    claude-code
+    ```
+
+    Notice how Claude now has context about your previous conversation and can reference earlier discussions.
+  </Step>
+</Steps>
+
+## Understanding Memory Behavior
+
+### What Gets Remembered
+
+claude-mem intelligently compresses and stores:
+
+- **Project insights**: Architecture decisions, technical requirements, and goals
+- **Problem-solving patterns**: How you approach and solve specific types of issues
+- **Code preferences**: Your coding style, preferred libraries, and patterns
+- **Decision rationale**: Why certain choices were made
+- **Key learnings**: Important discoveries and insights from your sessions
+
+### What Doesn't Get Remembered
+
+To protect privacy and maintain relevance:
+
+- **Sensitive information**: API keys, passwords, or personal data
+- **Verbose debugging output**: Long error logs or repetitive troubleshooting
+- **Off-topic conversations**: Discussions unrelated to your development work
+- **Transient state**: Temporary variables, current session specifics
+
+### Memory Loading
+
+<Tip>
+  **Smart Context Loading**: claude-mem loads relevant memories based on your current project. It uses the directory name to filter and prioritize the most relevant context.
+</Tip>
+
+```mermaid
+graph LR
+    A[Start Claude Code] --> B[Load Project Context]
+    B --> C[Filter by Project Name]
+    C --> D[Rank by Relevance]
+    D --> E[Present to Claude]
+    E --> F[Begin Enhanced Session]
+```
+
+## Essential Commands
+
+Here are the commands you'll use most frequently:
+
+<AccordionGroup>
+  <Accordion title="claude-mem status - Check System Health">
+    ```bash
+    claude-mem status
+    ```
+
+    Shows installation status, memory count, and system health. Use this to troubleshoot issues or verify everything is working.
+  </Accordion>
+
+  <Accordion title="claude-mem load-context - Preview Memories">
+    ```bash
+    # View recent memories for current project
+    claude-mem load-context
+
+    # View memories for a specific project
+    claude-mem load-context --project my-project
+
+    # Get raw JSON output
+    claude-mem load-context --format json
+    ```
+
+    Perfect for understanding what Claude will remember about your project.
+  </Accordion>
+
+  <Accordion title="claude-mem logs - Troubleshoot Issues">
+    ```bash
+    # View recent logs
+    claude-mem logs
+
+    # Follow logs in real-time
+    claude-mem logs --follow
+
+    # View only errors
+    claude-mem logs --error
+    ```
+
+    Essential for debugging when memories aren't loading correctly.
+  </Accordion>
+
+  <Accordion title="claude-mem save - Manual Memory Creation">
+    ```bash
+    claude-mem save "Important insight about authentication patterns"
+    ```
+
+    Manually save important insights that you want Claude to remember.
+  </Accordion>
+</AccordionGroup>
+
+## File System Overview
+
+claude-mem creates a clean directory structure:
+
+```
+~/.claude-mem/
+├── index/           # Compressed memory index (JSONL format)
+├── archives/        # Raw conversation transcripts
+├── hooks/           # Claude Code integration scripts
+├── trash/           # Safe deletion recovery (Smart Trash™)
+└── logs/           # Operation logs for troubleshooting
+```
+
+<Warning>
+  **Don't manually edit these files**. Always use the claude-mem CLI commands to interact with your memories. Direct file modification can corrupt the memory index.
+</Warning>
+
+## Next Steps
+
+<CardGrid>
+  <Card title="Best Practices" icon="lightbulb" href="/guides/best-practices">
+    Learn how to maximize the effectiveness of your memory system
+  </Card>
+  <Card title="Troubleshooting" icon="tools" href="/guides/troubleshooting">
+    Common issues and how to resolve them quickly
+  </Card>
+  <Card title="Context Loading" icon="download" href="/concepts/context-loading">
+    Understand how memories are loaded and prioritized
+  </Card>
+  <Card title="Smart Trash" icon="trash" href="/concepts/smart-trash">
+    Learn about the safe deletion and recovery system
+  </Card>
+</CardGrid>
+
+## Quick Troubleshooting
+
+If something doesn't work as expected:
+
+1. **Check Status**: Run `claude-mem status` to identify issues
+2. **Reinstall Hooks**: Try `claude-mem install --force`
+3. **Restart Claude Code**: Completely restart the application
+4. **Check Logs**: Use `claude-mem logs --error` to see error details
+
+<Tip>
+  Most issues are resolved by running `claude-mem install --force` and restarting Claude Code. This refreshes all integration components.
+</Tip>
+
+---
+
+You're now ready to experience persistent context in Claude Code! Every conversation builds on the last, creating a continuously improving AI assistant that remembers your project and preferences.

@@ -1,0 +1,399 @@
+---
+title: "Best Practices for Claude Memory"
+description: "Maximize the effectiveness of your memory system with proven strategies and techniques"
+---
+
+# Best Practices for Claude Memory
+
+Transform claude-mem from a simple session persistence tool into a powerful knowledge management system. These practices will help you build more valuable memories and get better results from Claude Code.
+
+## Creating High-Quality Memories
+
+### Structure Your Sessions for Better Compression
+
+The memory compression algorithm works best when conversations have clear structure and focus:
+
+<AccordionGroup>
+  <Accordion title="Start Sessions with Context">
+    Begin each Claude Code session by briefly stating your goals and context:
+
+    ```
+    "I'm working on a React e-commerce app. Today I want to implement
+    user authentication using JWT tokens. The app uses TypeScript
+    and follows clean architecture patterns."
+    ```
+
+    **Why this works**: Clear session goals help the compressor identify and preserve the most relevant insights.
+  </Accordion>
+
+  <Accordion title="Document Decision Rationale">
+    When making technical decisions, explain the reasoning:
+
+    ```
+    "I'm choosing Zustand over Redux because this app has simple state
+    needs and the team prefers minimal boilerplate. We don't need
+    time-travel debugging for this project."
+    ```
+
+    **Why this works**: Decision rationale is highly valuable for future sessions and gets prioritized during compression.
+  </Accordion>
+
+  <Accordion title="Summarize Key Learnings">
+    Before ending sessions, ask Claude to summarize what was learned:
+
+    ```
+    "Before we end, can you summarize the key insights about our
+    authentication implementation and any patterns we should remember?"
+    ```
+
+    **Why this works**: Explicit summaries ensure important insights are captured clearly.
+  </Accordion>
+</AccordionGroup>
+
+### Topics That Create Valuable Memories
+
+Focus conversations on these high-impact areas:
+
+<CardGrid>
+  <Card title="Architecture Decisions" icon="building">
+    **Examples**:
+    - Why you chose specific frameworks or libraries
+    - Database schema design decisions
+    - API design patterns
+    - Code organization strategies
+
+    **Memory Value**: ⭐⭐⭐⭐⭐
+  </Card>
+
+  <Card title="Problem-Solving Patterns" icon="lightbulb">
+    **Examples**:
+    - Debugging approaches that worked
+    - Performance optimization techniques
+    - Security implementation patterns
+    - Testing strategies
+
+    **Memory Value**: ⭐⭐⭐⭐⭐
+  </Card>
+
+  <Card title="Project Context" icon="folder">
+    **Examples**:
+    - Business requirements and constraints
+    - User stories and use cases
+    - Technical constraints and limitations
+    - Integration requirements
+
+    **Memory Value**: ⭐⭐⭐⭐
+  </Card>
+
+  <Card title="Code Patterns & Preferences" icon="code">
+    **Examples**:
+    - Coding style preferences
+    - Naming conventions
+    - File organization patterns
+    - Reusable component patterns
+
+    **Memory Value**: ⭐⭐⭐
+  </Card>
+</CardGrid>
+
+## Memory Organization Strategies
+
+### Project-Based Memory Management
+
+Organize memories by project for maximum relevance:
+
+<Steps>
+  <Step title="Use Consistent Directory Names">
+    Keep project directory names stable:
+
+    ```bash
+    # Good: Stable, descriptive names
+    ~/projects/ecommerce-app/
+    ~/projects/blog-cms/
+    ~/projects/inventory-system/
+
+    # Avoid: Changing or generic names
+    ~/Desktop/untitled-project/
+    ~/Downloads/new-app-v2/
+    ```
+
+    **Why**: Memory loading filters by directory name. Changing names breaks memory association.
+  </Step>
+
+  <Step title="Create Project Overview Memories">
+    Start new projects by having Claude create a comprehensive overview:
+
+    ```bash
+    claude-mem save "Project Overview: E-commerce app using React, TypeScript, Node.js. Features: user auth, product catalog, shopping cart, payment processing via Stripe. Database: PostgreSQL. Deployment: AWS ECS."
+    ```
+
+    **Why**: Overview memories provide essential context for all future sessions.
+  </Step>
+
+  <Step title="Use Descriptive Memory Saves">
+    Manually save important insights with clear descriptions:
+
+    ```bash
+    # Good: Specific and actionable
+    claude-mem save "Auth pattern: Using custom JWT refresh token rotation with 15min access tokens, 7-day refresh tokens stored in httpOnly cookies"
+
+    # Avoid: Vague or overly generic
+    claude-mem save "Fixed authentication bug"
+    ```
+  </Step>
+</Steps>
+
+### Multi-Project Knowledge Sharing
+
+Share insights across related projects:
+
+```bash
+# Save cross-project patterns
+claude-mem save "React performance pattern: Use React.memo() for components that receive complex props but render frequently. Measure with React DevTools profiler before optimizing."
+
+# Create reusable architecture insights
+claude-mem save "API design principle: Always include pagination metadata (total, page, limit) in list responses, even for small datasets. Future-proofs the API."
+```
+
+## Session Management Best Practices
+
+### Productive Session Patterns
+
+<AccordionGroup>
+  <Accordion title="The Deep Dive Session">
+    **Duration**: 30-60 minutes
+    **Focus**: Single complex problem or feature
+
+    **Structure**:
+    1. State the problem and context clearly
+    2. Explore different approaches with Claude
+    3. Implement the chosen solution
+    4. Document lessons learned and rationale
+    5. Ask Claude to summarize key insights
+
+    **Memory Result**: Rich, detailed memories about specific technical solutions
+  </Accordion>
+
+  <Accordion title="The Architecture Review">
+    **Duration**: 45-90 minutes
+    **Focus**: System design and high-level decisions
+
+    **Structure**:
+    1. Present current architecture or design challenge
+    2. Discuss pros/cons of different approaches
+    3. Make architectural decisions with clear rationale
+    4. Document patterns and principles established
+    5. Create action items for implementation
+
+    **Memory Result**: Strategic insights and decision frameworks
+  </Accordion>
+
+  <Accordion title="The Debugging Deep Dive">
+    **Duration**: 20-45 minutes
+    **Focus**: Solving specific bugs or issues
+
+    **Structure**:
+    1. Describe the problem and symptoms
+    2. Work through debugging process systematically
+    3. Identify root cause and solution
+    4. Discuss prevention strategies
+    5. Document debugging approach for similar issues
+
+    **Memory Result**: Debugging patterns and problem-solving strategies
+  </Accordion>
+</AccordionGroup>
+
+### Session Anti-Patterns to Avoid
+
+<Warning>
+  These session patterns create low-quality memories:
+
+  - **Rapid-fire questions**: Jumping between unrelated topics
+  - **Copy-paste coding**: Just generating code without discussion
+  - **Debugging dumps**: Pasting long error logs without analysis
+  - **Tutorial following**: Step-by-step tutorial work without adaptation
+  - **Trivial questions**: Basic syntax or documentation questions
+</Warning>
+
+## Memory Maintenance
+
+### Regular Memory Hygiene
+
+<Steps>
+  <Step title="Weekly Memory Review">
+    ```bash
+    # Review recent memories
+    claude-mem load-context --count 20
+
+    # Check for outdated or incorrect information
+    # Manually remove if needed using trash system
+    ```
+  </Step>
+
+  <Step title="Project Milestone Documentation">
+    At major project milestones, create comprehensive summaries:
+
+    ```bash
+    claude-mem save "Milestone: Authentication system complete. Implementation includes JWT with refresh tokens, role-based access control, password reset flow, and social login via OAuth2. Key learnings: refresh token rotation prevents replay attacks, middleware pattern simplifies route protection."
+    ```
+  </Step>
+
+  <Step title="Archive Old Project Memories">
+    For completed projects, reduce memory noise:
+
+    ```bash
+    # Move project to archive directory
+    mkdir ~/projects/archive/
+    mv ~/projects/old-project ~/projects/archive/
+
+    # Memories will automatically stop loading for archived projects
+    ```
+  </Step>
+</Steps>
+
+### Memory Quality Control
+
+Monitor and improve memory quality:
+
+```bash
+# Check memory statistics
+claude-mem load-context --format json | jq length
+
+# Review memory content periodically
+claude-mem load-context | head -20
+
+# Look for patterns in valuable vs. less valuable memories
+```
+
+## Advanced Techniques
+
+### Cross-Session Knowledge Building
+
+<AccordionGroup>
+  <Accordion title="Progressive Understanding">
+    Build understanding across multiple sessions:
+
+    **Session 1**: "Let's explore different state management approaches for this React app"
+    **Session 2**: "Based on our previous discussion about state management, let's implement Zustand"
+    **Session 3**: "Now that Zustand is working, let's add persistence and optimistic updates"
+
+    Each session builds on the previous, creating rich connected memories.
+  </Accordion>
+
+  <Accordion title="Pattern Recognition">
+    Use memories to identify recurring patterns:
+
+    ```
+    "I notice we've discussed error handling in several sessions.
+    Can you summarize the error handling patterns we've established
+    and suggest a consistent approach for this new feature?"
+    ```
+
+    This helps Claude recognize and apply established patterns.
+  </Accordion>
+
+  <Accordion title="Decision Evolution">
+    Document how decisions evolve over time:
+
+    ```bash
+    claude-mem save "Decision evolution: Initially chose REST API, but after implementing real-time features, switching to GraphQL subscriptions for better performance and type safety."
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Team Knowledge Sharing
+
+If working in a team context:
+
+<Steps>
+  <Step title="Establish Shared Conventions">
+    ```bash
+    claude-mem save "Team convention: All API endpoints return standardized error format: {error: string, code: number, details?: object}. Established in team meeting 2024-01-15."
+    ```
+  </Step>
+
+  <Step title="Document Collaborative Decisions">
+    ```bash
+    claude-mem save "Architecture decision (team consensus): Using event sourcing for user actions, traditional CRUD for reference data. Rationale: user actions need audit trail, reference data changes are infrequent."
+    ```
+  </Step>
+
+  <Step title="Share Learning Outcomes">
+    Document lessons that benefit the whole team:
+
+    ```bash
+    claude-mem save "Performance lesson: React component re-renders caused by object prop identity changes. Solution: useMemo for complex objects, useCallback for functions. Reduced re-renders by 60%."
+    ```
+  </Step>
+</Steps>
+
+## Measuring Memory Effectiveness
+
+### Quality Indicators
+
+**Good memory sessions produce**:
+- Clear, actionable insights
+- Decision rationale and context
+- Reusable patterns and principles
+- Problem-solving approaches
+- Architecture understanding
+
+**Check memory quality by asking**:
+- Can I understand the context from the memory alone?
+- Would this help me 6 months from now?
+- Does it capture the "why" not just the "what"?
+- Is it specific enough to be actionable?
+
+### Usage Metrics
+
+Track memory system effectiveness:
+
+```bash
+# Count total memories
+wc -l ~/.claude-mem/index/index.jsonl
+
+# Check recent memory creation rate
+tail -50 ~/.claude-mem/index/index.jsonl | grep $(date +%Y-%m-%d) | wc -l
+
+# Review memory distribution by project
+claude-mem load-context --format json | jq '.[].project' | sort | uniq -c
+```
+
+## Common Optimization Mistakes
+
+<Warning>
+  **Avoid these common mistakes**:
+
+  1. **Over-documenting**: Don't save every small decision or trivial insight
+  2. **Under-contextualizing**: Don't save technical details without business context
+  3. **Inconsistent naming**: Keep project directory names stable
+  4. **Session mixing**: Don't mix multiple unrelated topics in one session
+  5. **Passive usage**: Don't just rely on automatic compression - actively curate memories
+</Warning>
+
+## Integration with Development Workflow
+
+### Git Integration Patterns
+
+```bash
+# Link memories to significant commits
+git log --oneline -10
+claude-mem save "Commit abc123: Implemented user authentication with JWT. Key insight: refresh token rotation prevents security vulnerabilities while maintaining UX."
+
+# Document branch-specific decisions
+claude-mem save "Feature branch: payment-integration. Chose Stripe over PayPal for better international support and cleaner API design."
+```
+
+### CI/CD Memory Patterns
+
+```bash
+# Document deployment insights
+claude-mem save "Deployment lesson: Docker multi-stage builds reduced image size from 1.2GB to 150MB. Key: separate build and runtime stages, copy only production artifacts."
+
+# Capture infrastructure decisions
+claude-mem save "Infrastructure: AWS ECS with ALB provides better scaling than Lambda for this workload. Consistent response times under load, easier debugging."
+```
+
+---
+
+By following these best practices, your claude-mem system becomes a powerful knowledge repository that accelerates development and reduces repetitive problem-solving. The key is intentional memory creation and regular maintenance to ensure high-quality, relevant memories.

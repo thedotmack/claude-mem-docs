@@ -1,0 +1,448 @@
+---
+title: 'restore'
+description: 'Recover deleted memories and files from trash'
+---
+
+# claude-mem restore
+
+Recovers deleted items from the trash directory through an interactive selection interface.
+
+## Synopsis
+
+```bash
+claude-mem restore
+```
+
+## Description
+
+The `restore` command provides an interactive way to recover deleted items:
+
+1. **Interactive Selection** - Choose from available trash items
+2. **Safe Recovery** - Restores to current working directory
+3. **Simple Process** - No complex options or flags needed
+
+<Note>
+The restore command has no options or flags - it's designed to be simple and safe through interactive selection.
+</Note>
+
+## Examples
+
+### Basic Restoration
+
+```bash
+claude-mem restore
+```
+
+**Interactive Flow:**
+```
+? Select file to restore: (Use arrow keys)
+❯ config.json.1726405815234
+  old-memories.jsonl.1726319122456
+  project-backup.1726405815234
+  session-transcript.log.1726302008789
+```
+
+**After Selection:**
+```
+Restored config.json.1726405815234
+```
+
+The file is restored to the current directory with its original name (`config.json`).
+
+### Empty Trash
+
+When trash is empty:
+
+```bash
+claude-mem restore
+```
+
+**Output:**
+```
+Trash is empty
+```
+
+No selection interface appears since there are no items to restore.
+
+### Canceling Restoration
+
+During the selection process:
+
+1. **Press Esc** or **Ctrl+C** to cancel
+2. No items are restored
+3. Returns to command prompt immediately
+
+```
+? Select file to restore: (Use arrow keys)
+❯ config.json.1726405815234
+  old-memories.jsonl.1726319122456
+^C
+```
+
+No output on cancellation - process simply exits.
+
+## How Restoration Works
+
+### File Naming
+
+During restoration, items return to their original names:
+
+- **Trash:** `config.json.1726405815234`
+- **Restored:** `config.json`
+
+The timestamp suffix is automatically removed.
+
+### Target Location
+
+Items are restored to the **current working directory**:
+
+```bash
+# Working in /home/user/projects/my-app
+cd /home/user/projects/my-app
+claude-mem restore
+
+# File restored to: /home/user/projects/my-app/config.json
+```
+
+<Warning>
+Always ensure you're in the correct directory before running `claude-mem restore` to avoid restoring files to unintended locations.
+</Warning>
+
+### Conflict Handling
+
+If a file with the same name already exists:
+
+- **Overwrites existing file** without warning
+- No backup of existing file is created
+- Be careful when restoring to avoid data loss
+
+```bash
+# If config.json already exists in current directory
+claude-mem restore
+# Selecting config.json.1726405815234 will overwrite existing config.json
+```
+
+## Directory Restoration
+
+### Folder Recovery
+
+Directories are restored with full contents:
+
+```bash
+# Trash contains: project-backup.1726405815234/
+claude-mem restore
+
+# Restores to: ./project-backup/
+# With all subdirectories and files intact
+```
+
+### Directory Structure
+
+Original directory structure is preserved:
+
+```
+# Original structure before deletion:
+project-backup/
+├── src/
+│   ├── main.js
+│   └── utils.js
+├── docs/
+│   └── readme.md
+└── package.json
+
+# After restoration:
+./project-backup/
+├── src/
+│   ├── main.js
+│   └── utils.js
+├── docs/
+│   └── readme.md
+└── package.json
+```
+
+## Selection Interface
+
+### Navigation
+
+Use standard keyboard controls:
+
+| Key | Action |
+|-----|---------|
+| **↑/↓** | Navigate up/down |
+| **Enter** | Select current item |
+| **Esc** | Cancel restoration |
+| **Ctrl+C** | Cancel restoration |
+
+### Display Format
+
+Items show their trash names (with timestamps):
+
+```
+? Select file to restore:
+❯ config.json.1726405815234          ← Most recent
+  old-memories.jsonl.1726319122456   ← Older
+  session-transcript.log.1726302008789 ← Oldest
+```
+
+Items are typically ordered by deletion time (newest first).
+
+## Use Cases
+
+### Accidental Deletion Recovery
+
+Quickly recover accidentally deleted files:
+
+```bash
+# Oops, deleted important config
+rm config.json
+
+# Check what's in trash
+claude-mem trash-view
+
+# Restore the file
+claude-mem restore
+# → Select config.json.1726405815234
+# → File restored as config.json
+```
+
+### Project Restoration
+
+Recover entire deleted project folders:
+
+```bash
+# Restore full project directory
+claude-mem restore
+# → Select project-backup.1726405815234
+# → Full directory restored as project-backup/
+```
+
+### Memory Recovery
+
+Restore deleted memory files:
+
+```bash
+# Restore accidentally deleted memory index
+claude-mem restore
+# → Select memories.jsonl.1726405815234
+# → Memory file restored
+```
+
+## Best Practices
+
+### Preparation
+
+Before restoring:
+
+1. **Navigate to correct directory**
+   ```bash
+   cd /path/to/intended/location
+   ```
+
+2. **Check existing files**
+   ```bash
+   ls -la  # Verify what's already present
+   ```
+
+3. **View trash contents**
+   ```bash
+   claude-mem trash-view  # See what's available
+   ```
+
+### Safety
+
+To avoid conflicts:
+
+1. **Backup existing files** before restoration
+   ```bash
+   cp important-file.txt important-file.txt.backup
+   ```
+
+2. **Use temporary directory** for inspection
+   ```bash
+   mkdir temp-restore
+   cd temp-restore
+   claude-mem restore
+   # Inspect restored files, then move to final location
+   ```
+
+3. **Check file timestamps** to identify correct version
+   ```bash
+   claude-mem trash-view  # Note deletion dates
+   ```
+
+## Error Handling
+
+### Permission Denied
+
+If restoration fails due to permissions:
+
+```bash
+claude-mem restore
+# → Permission denied writing to current directory
+```
+
+**Solutions:**
+```bash
+# Check directory permissions
+ls -ld .
+
+# Fix permissions if needed
+chmod 755 .
+
+# Or move to writable directory
+cd ~/Documents
+claude-mem restore
+```
+
+### Disk Space
+
+If insufficient space for restoration:
+
+```bash
+claude-mem restore
+# → No space left on device
+```
+
+**Solutions:**
+```bash
+# Check available space
+df -h .
+
+# Free up space or choose different directory
+cd /path/with/more/space
+claude-mem restore
+```
+
+### Corrupted Trash Items
+
+If trash items are corrupted:
+
+```bash
+claude-mem restore
+# → Error reading trash item
+```
+
+**Solutions:**
+```bash
+# Check trash integrity
+claude-mem trash-view
+
+# If necessary, clean corrupted items
+claude-mem trash empty
+```
+
+## Integration
+
+### With Workflow Scripts
+
+Automate restoration in scripts:
+
+```bash
+#!/bin/bash
+
+# Restore to specific directory
+cd /home/user/recovery/
+echo "Restoring to recovery directory..."
+
+# Note: restore command is interactive,
+# so automation requires expect or similar tools
+```
+
+### With File Management
+
+Common workflow patterns:
+
+```bash
+# 1. Check what's available
+claude-mem trash-view
+
+# 2. Navigate to target location
+cd /path/to/restore/location
+
+# 3. Restore items
+claude-mem restore
+
+# 4. Verify restoration
+ls -la
+```
+
+## Limitations
+
+### Interactive Only
+
+- No batch restoration options
+- No command-line file specification
+- No scripting-friendly modes
+
+### Single Directory Target
+
+- Always restores to current working directory
+- No option to specify different target location
+- No support for restoring to original location
+
+### No Conflict Resolution
+
+- Overwrites existing files without prompting
+- No backup of overwritten files
+- No merge options for directories
+
+## Troubleshooting
+
+### No Items to Restore
+
+```bash
+claude-mem restore
+# → Trash is empty
+```
+
+**Possible causes:**
+1. No files have been deleted
+2. Trash was previously emptied
+3. Items were manually removed from trash directory
+
+### Selection Interface Issues
+
+If selection interface doesn't work:
+
+1. **Terminal compatibility** - Ensure terminal supports interactive prompts
+2. **SSH sessions** - May not support interactive mode
+3. **Screen/tmux** - May interfere with prompt display
+
+### Restoration to Wrong Location
+
+If files appear in unexpected location:
+
+1. **Check current directory**
+   ```bash
+   pwd  # Verify where you ran restore command
+   ```
+
+2. **Find restored files**
+   ```bash
+   find . -name "restored-filename" -type f
+   ```
+
+3. **Move to correct location**
+   ```bash
+   mv restored-file /correct/path/
+   ```
+
+## Related Commands
+
+<CardGrid cols={3}>
+  <Card title="trash-view" icon="trash" href="/cli/trash-view">
+    View deleted items
+  </Card>
+  <Card title="load-context" icon="brain" href="/cli/load-context">
+    Check trash status
+  </Card>
+  <Card title="status" icon="heart-pulse" href="/cli/status">
+    System overview
+  </Card>
+</CardGrid>
+
+## See Also
+
+- [`trash-view`](/cli/trash-view) - View available items for restoration
+- [`load-context`](/cli/load-context) - Shows trash status in context
+- [File Management](/concepts/file-management) - Understanding deletion and recovery

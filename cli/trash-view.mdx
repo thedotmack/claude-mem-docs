@@ -1,0 +1,338 @@
+---
+title: 'trash-view'
+description: 'View and manage deleted memories and files'
+---
+
+# claude-mem trash-view
+
+Displays the contents of the trash directory, showing deleted memories, files, and folders that can be restored.
+
+## Synopsis
+
+```bash
+claude-mem trash-view
+```
+
+## Description
+
+The `trash-view` command provides a detailed view of deleted items:
+
+1. **File Listing** - Shows all trashed items with metadata
+2. **Size Information** - Displays individual and total sizes
+3. **Deletion Dates** - When items were moved to trash
+4. **Restore Instructions** - How to recover items
+
+## Examples
+
+### View Trash Contents
+
+```bash
+claude-mem trash-view
+```
+
+**Sample Output:**
+```
+
+🗑️  Trash Contents
+
+────────────────────────────────────────────────────────────────────────────────
+
+📁 project-backup
+   Size: 2.3 MB | Trashed: 9/15/2025, 10:30:15 AM
+   ID: project-backup.1726405815234
+
+📄 old-memories.jsonl
+   Size: 456.7 KB | Trashed: 9/14/2025, 3:45:22 PM
+   ID: old-memories.jsonl.1726319122456
+
+📄 session-transcript.log
+   Size: 123.4 KB | Trashed: 9/14/2025, 11:20:08 AM
+   ID: session-transcript.log.1726302008789
+
+────────────────────────────────────────────────────────────────────────────────
+Total: 1 folders, 2 files (2.9 MB)
+
+To restore files: claude-mem restore
+To empty trash:   claude-mem trash empty
+```
+
+### Empty Trash
+
+When trash is empty:
+
+```bash
+claude-mem trash-view
+```
+
+**Output:**
+```
+🗑️  Trash is empty
+```
+
+## Item Display Format
+
+### Files
+
+Individual files show:
+```
+📄 filename.ext
+   Size: 123.4 KB | Trashed: 9/14/2025, 3:45:22 PM
+   ID: filename.ext.1726319122456
+```
+
+- **📄 Icon** - Indicates file type
+- **Size** - Human-readable file size
+- **Trashed Date** - When item was deleted
+- **ID** - Unique identifier for restoration
+
+### Directories
+
+Folders show aggregated information:
+```
+📁 folder-name
+   Size: 2.3 MB | Trashed: 9/15/2025, 10:30:15 AM
+   ID: folder-name.1726405815234
+```
+
+- **📁 Icon** - Indicates directory
+- **Size** - Total size of all contents
+- **Recursive Calculation** - Includes all subdirectories and files
+
+## Trash Item Naming
+
+### Naming Convention
+
+Deleted items are renamed with timestamps:
+```
+original-name.timestamp
+```
+
+For example:
+- `config.json` → `config.json.1726405815234`
+- `project-folder` → `project-folder.1726405815234`
+
+### Timestamp Format
+
+Timestamps represent Unix epoch milliseconds:
+- `1726405815234` = September 15, 2025, 10:30:15.234 AM
+
+This ensures unique names and preserves deletion order.
+
+## Size Formatting
+
+Sizes are displayed in human-readable format:
+
+| Range | Format | Example |
+|-------|--------|---------|
+| < 1 KB | Bytes | `512 B` |
+| < 1 MB | Kilobytes | `456.7 KB` |
+| < 1 GB | Megabytes | `2.3 MB` |
+| ≥ 1 GB | Gigabytes | `1.2 GB` |
+
+Precision is limited to 2 decimal places for readability.
+
+## Sorting
+
+Items are displayed in deletion order:
+- **Newest first** - Most recently deleted items at top
+- **Chronological** - Based on deletion timestamp
+- **Mixed types** - Files and folders intermixed by date
+
+## Directory Size Calculation
+
+For folders, size represents total contents:
+
+```
+project-folder/
+├── src/
+│   ├── main.js (50 KB)
+│   └── utils.js (25 KB)
+├── docs/
+│   └── readme.md (10 KB)
+└── package.json (5 KB)
+
+Total: 90 KB
+```
+
+The trash view would show:
+```
+📁 project-folder
+   Size: 90 KB | Trashed: 9/15/2025, 10:30:15 AM
+```
+
+## Error Handling
+
+### Permission Issues
+
+```bash
+claude-mem trash-view
+```
+
+**Output:**
+```
+Failed to read trash directory
+Permission denied: ~/.claude-mem/trash/
+```
+
+**Solution:**
+```bash
+# Fix permissions
+chmod 755 ~/.claude-mem/trash/
+```
+
+### Corrupted Trash
+
+If trash directory is damaged:
+
+```bash
+claude-mem trash-view
+```
+
+**Output:**
+```
+Failed to read trash directory
+Error: Invalid directory structure
+```
+
+**Solutions:**
+```bash
+# Recreate trash directory
+rm -rf ~/.claude-mem/trash/
+mkdir -p ~/.claude-mem/trash/
+
+# Or reinstall claude-mem
+claude-mem install --force
+```
+
+## Management Actions
+
+### After Viewing Trash
+
+Common next steps:
+
+```bash
+# Restore specific item
+claude-mem restore
+
+# Empty entire trash
+claude-mem trash empty
+
+# Restore all items
+claude-mem restore --all
+```
+
+### Selective Restoration
+
+The trash view helps identify items for restoration:
+
+1. **Note the ID** - Copy the unique identifier
+2. **Run restore** - Use `claude-mem restore`
+3. **Select item** - Choose from interactive list
+
+## Storage Location
+
+Trash items are stored in:
+```
+~/.claude-mem/trash/
+├── config.json.1726405815234
+├── old-memories.jsonl.1726319122456
+├── project-backup.1726405815234/
+└── session-transcript.log.1726302008789
+```
+
+<Warning>
+Direct manipulation of trash directory contents may cause issues. Use `claude-mem restore` and `claude-mem trash empty` instead.
+</Warning>
+
+## Performance Considerations
+
+### Large Directories
+
+For folders with many files:
+- Size calculation may take time
+- Progress not shown during scan
+- Consider using `claude-mem trash empty` for large cleanups
+
+### Many Items
+
+With numerous trash items:
+- All items displayed (no pagination)
+- Consider regular cleanup
+- Use `claude-mem trash empty` periodically
+
+## Integration
+
+### With Scripts
+
+Check trash status programmatically:
+
+```bash
+#!/bin/bash
+
+# Check if trash has contents
+if claude-mem trash-view | grep -q "📄\|📁"; then
+    echo "Trash contains items"
+    claude-mem trash-view
+else
+    echo "Trash is empty"
+fi
+```
+
+### With Cleanup Workflows
+
+Regular maintenance:
+
+```bash
+# Weekly cleanup script
+if claude-mem trash-view | grep -q "Total:"; then
+    echo "Cleaning up trash..."
+    claude-mem trash empty --force
+fi
+```
+
+## Troubleshooting
+
+### Missing Items
+
+If expected items don't appear:
+
+1. **Check spelling** - Verify original filename
+2. **Check timing** - Item might not be in trash
+3. **Check permissions** - Ensure read access to trash
+4. **Check location** - Verify trash directory path
+
+### Size Discrepancies
+
+If sizes seem incorrect:
+
+1. **Hidden files** - May include system files
+2. **Symlinks** - Links counted as files
+3. **Sparse files** - May report differently
+
+### Restore Issues
+
+If restoration seems unavailable:
+
+1. **Check IDs** - Ensure correct identifier format
+2. **Check permissions** - Verify write access to destination
+3. **Check space** - Ensure sufficient disk space
+
+## Related Commands
+
+<CardGrid cols={3}>
+  <Card title="restore" icon="rotate-left" href="/cli/restore">
+    Recover deleted items
+  </Card>
+  <Card title="load-context" icon="brain" href="/cli/load-context">
+    View memories
+  </Card>
+  <Card title="status" icon="heart-pulse" href="/cli/status">
+    System health
+  </Card>
+</CardGrid>
+
+## See Also
+
+- [`restore`](/cli/restore) - Recover deleted items
+- [`load-context`](/cli/load-context) - Trash status in context
+- [File Management](/concepts/file-management) - Understanding deletion

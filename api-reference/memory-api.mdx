@@ -1,0 +1,392 @@
+---
+title: "Memory API"
+description: "Document the memory storage and retrieval APIs"
+---
+
+# Memory API
+
+Claude-mem uses the Model Context Protocol (MCP) to provide standardized memory operations through ChromaDB. This API allows you to store, retrieve, and search through conversation memories programmatically.
+
+## MCP Client Interface
+
+### IMCPClient
+
+The core interface for memory operations:
+
+```typescript
+interface IMCPClient {
+  connect(): Promise<void>;
+  disconnect(): Promise<void>;
+  addDocuments(documents: MCPDocument[]): Promise<void>;
+  queryDocuments(query: string, limit?: number): Promise<MCPSearchResult>;
+  getDocuments(ids?: string[]): Promise<MCPSearchResult>;
+}
+```
+
+### Document Structure
+
+Memory documents follow a standardized format:
+
+```typescript
+interface MCPDocument {
+  id: string;              // Unique document identifier
+  content: string;         // The memory content
+  metadata?: Record<string, unknown>; // Additional metadata
+}
+```
+
+### Search Results
+
+Search operations return structured results:
+
+```typescript
+interface MCPSearchResult {
+  documents?: MCPDocument[];
+  ids?: string[];
+  metadatas?: Record<string, unknown>[];
+  distances?: number[];    // Similarity scores (lower = more similar)
+  [key: string]: unknown;
+}
+```
+
+## Available MCP Tools
+
+Claude-mem provides these MCP tools for memory operations:
+
+### Collection Management
+
+<CodeGroup>
+
+```typescript Collection Operations
+// List all collections
+mcp__claude-mem__chroma_list_collections(
+  limit?: number,
+  offset?: number
+): Promise<string[]>
+
+// Create a new collection
+mcp__claude-mem__chroma_create_collection(
+  collection_name: string,
+  embedding_function_name?: string,
+  metadata?: Record<string, unknown>
+): Promise<void>
+
+// Get collection information
+mcp__claude-mem__chroma_get_collection_info(
+  collection_name: string
+): Promise<CollectionInfo>
+
+// Get document count in collection
+mcp__claude-mem__chroma_get_collection_count(
+  collection_name: string
+): Promise<number>
+```
+
+```javascript Usage Example
+// Create a new memory collection
+await mcp__claude_mem__chroma_create_collection(
+  "my_project_memories",
+  "default",
+  { project: "my-project", version: "1.0" }
+);
+
+// Check collection status
+const info = await mcp__claude_mem__chroma_get_collection_info(
+  "my_project_memories"
+);
+console.log(`Collection has ${info.count} documents`);
+```
+
+</CodeGroup>
+
+### Document Operations
+
+<CodeGroup>
+
+```typescript Document Operations
+// Add documents to collection
+mcp__claude-mem__chroma_add_documents(
+  collection_name: string,
+  documents: string[],
+  ids: string[],
+  metadatas?: Record<string, unknown>[]
+): Promise<void>
+
+// Query documents semantically
+mcp__claude-mem__chroma_query_documents(
+  collection_name: string,
+  query_texts: string[],
+  n_results?: number,
+  where?: Record<string, unknown>,
+  where_document?: Record<string, unknown>,
+  include?: string[]
+): Promise<SearchResult>
+
+// Get specific documents
+mcp__claude-mem__chroma_get_documents(
+  collection_name: string,
+  ids?: string[],
+  where?: Record<string, unknown>,
+  limit?: number,
+  offset?: number
+): Promise<DocumentResult>
+```
+
+```javascript Usage Example
+// Add memories to collection
+await mcp__claude_mem__chroma_add_documents(
+  "claude_memories",
+  [
+    "Implemented user authentication using JWT tokens",
+    "Fixed bug in payment processing pipeline",
+    "Added dark mode support to React components"
+  ],
+  ["auth_implementation", "payment_bugfix", "darkmode_feature"],
+  [
+    { project: "webapp", type: "implementation", date: "2024-01-15" },
+    { project: "webapp", type: "bugfix", date: "2024-01-16" },
+    { project: "webapp", type: "feature", date: "2024-01-17" }
+  ]
+);
+
+// Search for authentication-related memories
+const results = await mcp__claude_mem__chroma_query_documents(
+  "claude_memories",
+  ["authentication login security"],
+  5,
+  { project: "webapp" }
+);
+```
+
+</CodeGroup>
+
+### Advanced Filtering
+
+Use the `where` and `where_document` parameters for precise filtering:
+
+```typescript
+// Metadata filtering examples
+const metadataFilters = {
+  // Simple equality
+  "project": "my-project",
+
+  // Comparison operators
+  "date": { "$gt": "2024-01-01" },
+
+  // Logical operators
+  "$and": [
+    { "project": { "$eq": "webapp" } },
+    { "type": { "$eq": "bugfix" } }
+  ],
+
+  "$or": [
+    { "priority": "high" },
+    { "urgent": true }
+  ]
+};
+
+// Document content filtering examples
+const documentFilters = {
+  // Contains text
+  "$contains": "authentication",
+
+  // Regex pattern
+  "$regex": "bug.*fix",
+
+  // Logical combinations
+  "$and": [
+    { "$contains": "React" },
+    { "$not_contains": "deprecated" }
+  ]
+};
+
+// Apply filters in query
+const filteredResults = await mcp__claude_mem__chroma_query_documents(
+  "claude_memories",
+  ["user interface components"],
+  10,
+  metadataFilters,
+  documentFilters
+);
+```
+
+## Memory Node Structure
+
+When memories are created through compression, they follow this structure:
+
+```typescript
+interface MemoryNode {
+  id: string;                    // Unique identifier
+  type: 'document';              // Always 'document' for memories
+  content: string;               // The memory text
+  timestamp: string;             // ISO timestamp
+  metadata?: {
+    project?: string;            // Project name
+    session_id?: string;         // Session identifier
+    keywords?: string;           // Comma-separated keywords
+    document_id?: string;        // Original document ID
+    archive?: string;            // Archive filename
+    [key: string]: unknown;
+  };
+}
+```
+
+## Compression Result
+
+The compression process produces structured results:
+
+```typescript
+interface CompressionResult {
+  compressedLines: string[];     // Generated memory texts
+  originalTokens: number;        // Token count before compression
+  compressedTokens: number;      // Token count after compression
+  compressionRatio: number;      // Ratio of compression achieved
+  memoryNodes: string[];         // Created memory node IDs
+}
+```
+
+## Error Handling
+
+Memory operations can throw specific errors:
+
+```typescript
+try {
+  await mcp__claude_mem__chroma_add_documents(
+    "my_collection",
+    documents,
+    ids
+  );
+} catch (error) {
+  if (error.message.includes("collection does not exist")) {
+    // Create collection first
+    await mcp__claude_mem__chroma_create_collection("my_collection");
+    // Retry operation
+  } else if (error.message.includes("ids must match")) {
+    // Fix ID array length
+  } else {
+    throw error;
+  }
+}
+```
+
+## Best Practices
+
+### 1. Collection Naming
+
+Use consistent naming conventions:
+
+```typescript
+// Good: project-specific collections
+const collectionName = `${projectName}_memories`;
+
+// Good: versioned collections
+const collectionName = `${projectName}_v${version}_memories`;
+
+// Avoid: generic names that could conflict
+const collectionName = "memories"; // Too generic
+```
+
+### 2. Metadata Strategy
+
+Include meaningful metadata for better filtering:
+
+```typescript
+const metadata = {
+  project: "my-project",
+  session_id: "session_123",
+  timestamp: new Date().toISOString(),
+  type: "implementation", // implementation, bugfix, feature, discussion
+  tags: ["react", "typescript", "api"],
+  priority: "high",
+  file_paths: ["/src/components/Auth.tsx"]
+};
+```
+
+### 3. Query Optimization
+
+Use specific queries for better results:
+
+```typescript
+// Good: specific, contextual queries
+const query = "React component authentication JWT token validation";
+
+// Less effective: single words
+const query = "auth";
+
+// Include project context when querying across projects
+const query = `${projectName} authentication implementation`;
+```
+
+### 4. Batch Operations
+
+Process documents in batches for better performance:
+
+```typescript
+const BATCH_SIZE = 50;
+
+for (let i = 0; i < documents.length; i += BATCH_SIZE) {
+  const batch = documents.slice(i, i + BATCH_SIZE);
+  const batchIds = ids.slice(i, i + BATCH_SIZE);
+  const batchMetadata = metadatas?.slice(i, i + BATCH_SIZE);
+
+  await mcp__claude_mem__chroma_add_documents(
+    collectionName,
+    batch,
+    batchIds,
+    batchMetadata
+  );
+}
+```
+
+## Integration Examples
+
+### With TranscriptCompressor
+
+The compression API automatically handles memory storage:
+
+```typescript
+import { TranscriptCompressor } from 'claude-mem';
+
+const compressor = new TranscriptCompressor();
+const result = await compressor.compress('/path/to/transcript.jsonl');
+
+// Memories are automatically stored in "claude_memories" collection
+// Query them using MCP tools
+const relatedMemories = await mcp__claude_mem__chroma_query_documents(
+  "claude_memories",
+  ["recent implementation work"],
+  5
+);
+```
+
+### Custom Memory Storage
+
+Store custom memories outside of transcript compression:
+
+```typescript
+// Store custom observations or notes
+await mcp__claude_mem__chroma_add_documents(
+  "claude_memories",
+  [
+    "Team decided to migrate from REST to GraphQL for better type safety",
+    "Database performance improved 40% after indexing user_id column",
+    "New deployment pipeline reduces build time from 10min to 3min"
+  ],
+  [
+    `decision_${Date.now()}_graphql`,
+    `optimization_${Date.now()}_db`,
+    `improvement_${Date.now()}_ci`
+  ],
+  [
+    { type: "decision", category: "architecture" },
+    { type: "optimization", category: "database" },
+    { type: "improvement", category: "devops" }
+  ]
+);
+```
+
+## Next Steps
+
+- [Compression API](/api-reference/compression-api) - Learn about transcript processing
+- [Hooks API](/api-reference/hooks-api) - Integrate with Claude Code events
+- [API Overview](/api-reference/overview) - General API concepts

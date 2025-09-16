@@ -1,0 +1,607 @@
+---
+title: "Compression API"
+description: "Document the compression/transcript processing APIs"
+---
+
+# Compression API
+
+The Compression API transforms Claude Code conversation transcripts into searchable memory documents. This system analyzes conversations, extracts key insights, and stores them in a vector database for future retrieval.
+
+## Core Classes
+
+### TranscriptCompressor
+
+The main compression engine that processes Claude Code transcripts.
+
+```typescript
+class TranscriptCompressor {
+  constructor(options: CompressionOptions = {})
+  compress(transcriptPath: string, sessionId?: string, originalProjectName?: string): Promise<string>
+  showFilteredOutput(transcriptPath: string, enableChunking?: boolean): void
+}
+```
+
+#### Constructor Options
+
+```typescript
+interface CompressionOptions {
+  output?: string;      // Output directory (optional)
+  dryRun?: boolean;     // Preview mode without saving
+  verbose?: boolean;    // Enable verbose logging
+}
+```
+
+#### Basic Usage
+
+<CodeGroup>
+
+```typescript Simple Compression
+import { TranscriptCompressor } from 'claude-mem';
+
+// Initialize compressor
+const compressor = new TranscriptCompressor({
+  verbose: true
+});
+
+// Compress a transcript
+const archivePath = await compressor.compress(
+  '/path/to/transcript.jsonl'
+);
+
+console.log(`Archive created: ${archivePath}`);
+```
+
+```typescript Advanced Compression
+import { TranscriptCompressor } from 'claude-mem';
+
+const compressor = new TranscriptCompressor({
+  dryRun: false,
+  verbose: true
+});
+
+// Compress with custom session ID and project
+const archivePath = await compressor.compress(
+  '/Users/dev/conversations/session_123.jsonl',
+  'custom_session_id',
+  'imported_project_name'
+);
+
+// The result includes:
+// - Extracted memories in vector database
+// - Archived original transcript
+// - Generated overview (if applicable)
+```
+
+</CodeGroup>
+
+#### Compression Process
+
+The compression follows these stages:
+
+1. **Reading** - Parse JSONL transcript file
+2. **Analyzing** - Extract conversation structure and content
+3. **Compressing** - Generate semantic memories using LLM
+4. **Writing** - Store memories and create archive
+
+### ChunkManager
+
+Handles large transcripts that exceed token limits through intelligent chunking.
+
+```typescript
+class ChunkManager {
+  needsChunking(content: string): boolean
+  chunkTranscript(content: string, options?: ChunkingOptions): Chunk[]
+  getChunkingStats(chunks: Chunk[]): string
+  createChunkHeader(metadata: ChunkMetadata): string
+}
+```
+
+#### Chunking Options
+
+```typescript
+interface ChunkingOptions {
+  maxTokensPerChunk?: number;     // Default: 40000
+  overlapMessages?: number;       // Default: 2 (context continuity)
+  preserveMessageBoundaries?: boolean; // Default: true
+}
+```
+
+#### Chunk Structure
+
+```typescript
+interface Chunk {
+  content: string;
+  metadata: ChunkMetadata;
+}
+
+interface ChunkMetadata {
+  chunkIndex: number;
+  totalChunks: number;
+  startIndex: number;
+  endIndex: number;
+  estimatedTokens: number;
+  hasOverlap: boolean;
+  overlapMessages?: number;
+  firstTimestamp?: string;
+  lastTimestamp?: string;
+}
+```
+
+<CodeGroup>
+
+```typescript Chunking Example
+import { ChunkManager } from 'claude-mem';
+
+const chunkManager = new ChunkManager();
+const content = readLargeTranscript();
+
+// Check if chunking is needed
+if (chunkManager.needsChunking(content)) {
+  console.log("Large transcript detected, chunking...");
+
+  const chunks = chunkManager.chunkTranscript(content, {
+    maxTokensPerChunk: 35000,
+    overlapMessages: 3
+  });
+
+  console.log(chunkManager.getChunkingStats(chunks));
+
+  // Process each chunk
+  for (const chunk of chunks) {
+    console.log(`Processing chunk ${chunk.metadata.chunkIndex + 1}/${chunk.metadata.totalChunks}`);
+    // Each chunk maintains context from previous chunk
+  }
+}
+```
+
+```typescript Chunk Processing
+// Example chunk metadata
+{
+  chunkIndex: 1,
+  totalChunks: 4,
+  startIndex: 150,
+  endIndex: 299,
+  estimatedTokens: 38500,
+  hasOverlap: true,
+  overlapMessages: 2,
+  firstTimestamp: "2024-01-15T10:30:00Z",
+  lastTimestamp: "2024-01-15T11:45:00Z"
+}
+```
+
+</CodeGroup>
+
+### PromptOrchestrator
+
+Manages prompt generation for LLM analysis and human context.
+
+```typescript
+class PromptOrchestrator {
+  constructor(projectName?: string)
+  createAnalysisPrompt(context: AnalysisContext): AnalysisPrompt
+  createSessionStartPrompt(context: SessionContext): SessionPrompt
+  createHookResponse(context: HookContext): HookResponse
+}
+```
+
+#### Analysis Context
+
+```typescript
+interface AnalysisContext {
+  transcriptContent: string;        // The conversation to analyze
+  sessionId: string;               // Session identifier
+  projectName?: string;            // Project context
+  customInstructions?: string;     // Additional analysis instructions
+  trigger?: 'manual' | 'auto';    // How compression was triggered
+  originalTokens?: number;         // Original token count
+  targetCompressionRatio?: number; // Desired compression ratio
+}
+```
+
+<CodeGroup>
+
+```typescript Prompt Generation
+import {
+  PromptOrchestrator,
+  createAnalysisContext
+} from 'claude-mem';
+
+const orchestrator = new PromptOrchestrator('my-project');
+
+// Create analysis context
+const context = createAnalysisContext(
+  transcriptContent,
+  'session_123',
+  {
+    projectName: 'web-app',
+    trigger: 'manual',
+    originalTokens: 45000
+  }
+);
+
+// Generate analysis prompt
+const analysisPrompt = orchestrator.createAnalysisPrompt(context);
+
+console.log('Prompt type:', analysisPrompt.type); // 'analysis'
+console.log('Generated at:', analysisPrompt.timestamp);
+```
+
+```typescript Session Context
+import {
+  createSessionContext
+} from 'claude-mem';
+
+// Create session start context
+const sessionContext = createSessionContext(
+  'session_456',
+  'startup',
+  {
+    projectName: 'mobile-app',
+    cwd: '/Users/dev/mobile-app',
+    additionalContext: 'Working on authentication flow'
+  }
+);
+
+const sessionPrompt = orchestrator.createSessionStartPrompt(sessionContext);
+```
+
+</CodeGroup>
+
+## Message Processing
+
+### Transcript Message Structure
+
+The system processes various message types from Claude Code transcripts:
+
+```typescript
+interface TranscriptMessage {
+  type: string;                    // 'user', 'assistant', 'system', 'tool_result'
+  message?: {
+    content?: string | ContentItem[];
+    role?: string;
+    timestamp?: string;
+  };
+  content?: string | ContentItem[];
+  role?: string;
+  uuid?: string;
+  session_id?: string;
+  timestamp?: string;
+  subtype?: string;
+  result?: string;
+  model?: string;
+  tools?: unknown[];
+  mcp_servers?: unknown[];
+  toolUseResult?: ToolUseResult;
+}
+
+interface ContentItem {
+  type: 'text' | 'tool_use' | 'tool_result' | 'thinking';
+  text?: string;
+  thinking?: string;
+  name?: string;      // For tool_use
+  id?: string;        // For tool_use
+  content?: unknown;  // For tool_result
+}
+
+interface ToolUseResult {
+  stdout?: string;
+  stderr?: string;
+  interrupted?: boolean;
+  isImage?: boolean;
+}
+```
+
+### Content Extraction
+
+The system intelligently extracts content from different message types:
+
+<CodeGroup>
+
+```typescript Content Processing
+// User and assistant messages
+if (message.type === 'user' || message.type === 'assistant') {
+  const content = message.message?.content;
+
+  if (Array.isArray(content)) {
+    // Handle mixed content (text, tool_use, tool_result)
+    const extractedText = content
+      .map(item => extractContentItem(item))
+      .filter(Boolean)
+      .join(' ');
+  }
+}
+
+// Tool results with large content filtering
+if (message.type === 'tool_result') {
+  const contentSize = calculateContentSize(message.content);
+
+  if (contentSize > 1024 * 1024) { // 1MB threshold
+    const sizeMB = Math.round(contentSize / (1024 * 1024) * 10) / 10;
+    return `[FILTERED: Large tool result ~${sizeMB}MB]`;
+  }
+}
+```
+
+```typescript Message Flow Labels
+// Clear message direction indicators
+function createMessageFlowLabel(message: TranscriptMessage, index: number): string {
+  switch (message.type) {
+    case 'user':
+      return `Message ${index} (user → assistant)`;
+    case 'assistant':
+      return `Message ${index} (assistant → user)`;
+    case 'tool_result':
+      return `Message ${index} (tool → assistant)`;
+    case 'system':
+      return `Message ${index} (system)`;
+    default:
+      return `Message ${index} (${message.type})`;
+  }
+}
+```
+
+</CodeGroup>
+
+## Compression Results
+
+### CompressionResult Interface
+
+```typescript
+interface CompressionResult {
+  compressedLines: string[];     // Generated memory summaries
+  originalTokens: number;        // Input token count
+  compressedTokens: number;      // Output token count
+  compressionRatio: number;      // Achieved compression ratio
+  memoryNodes: string[];         // Created memory document IDs
+}
+```
+
+### Memory Document Format
+
+Extracted memories follow this JSON structure:
+
+```typescript
+interface ExtractedMemory {
+  text: string;                  // The memory content
+  document_id: string;           // Unique identifier
+  keywords: string;              // Comma-separated keywords
+  timestamp: string;             // ISO timestamp
+  archive: string;               // Archive filename reference
+}
+```
+
+### Archive Structure
+
+Compressed sessions create these artifacts:
+
+```
+~/.claude-mem/
+├── archives/
+│   └── {project}/
+│       └── session_123.jsonl.archive    # Original transcript
+├── index.jsonl                          # Memory index (JSONL format)
+└── logs/
+    ├── claude-mem-{timestamp}.log       # Debug logs
+    ├── claude-prompt-{timestamp}.txt    # LLM prompts
+    └── claude-response-{timestamp}.txt  # LLM responses
+```
+
+<CodeGroup>
+
+```json Memory Index Entry
+{
+  "type": "memory",
+  "text": "Implemented JWT authentication with refresh token rotation",
+  "document_id": "auth_implementation_jwt",
+  "keywords": "authentication, JWT, security, tokens",
+  "session_id": "session_123",
+  "project": "web_app",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "archive": "session_123.jsonl.archive"
+}
+```
+
+```json Session Overview Entry
+{
+  "type": "overview",
+  "content": "Session focused on implementing secure authentication flow with JWT tokens, including user registration, login, and token refresh mechanisms.",
+  "session_id": "session_123",
+  "project": "web_app",
+  "timestamp": "2024-01-15T11:45:00Z"
+}
+```
+
+</CodeGroup>
+
+## Command-Line Integration
+
+### compress Command
+
+```typescript
+import { compress } from 'claude-mem/commands';
+
+// Programmatic usage
+await compress('/path/to/transcript.jsonl', {
+  sessionId: 'custom_session',
+  verbose: true
+});
+```
+
+### CLI Options
+
+```bash
+# Basic compression
+claude-mem compress /path/to/transcript.jsonl
+
+# With custom session ID
+claude-mem compress /path/to/transcript.jsonl --session-id=my_session
+
+# Verbose output
+claude-mem compress /path/to/transcript.jsonl --verbose
+
+# Show filtered output without compression
+claude-mem compress --show-filtered /path/to/transcript.jsonl
+```
+
+## Error Handling
+
+### CompressionError
+
+```typescript
+import { CompressionError } from 'claude-mem';
+
+try {
+  await compressor.compress(transcriptPath);
+} catch (error) {
+  if (error instanceof CompressionError) {
+    console.error(`Compression failed at stage: ${error.stage}`);
+    console.error(`Transcript: ${error.transcriptPath}`);
+
+    switch (error.stage) {
+      case 'reading':
+        console.error('Check file permissions and format');
+        break;
+      case 'analyzing':
+        console.error('Transcript content may be corrupted');
+        break;
+      case 'compressing':
+        console.error('LLM analysis failed');
+        break;
+      case 'writing':
+        console.error('Check disk space and permissions');
+        break;
+    }
+  }
+}
+```
+
+### Common Error Scenarios
+
+<CodeGroup>
+
+```typescript File Errors
+// File not found
+if (!fs.existsSync(transcriptPath)) {
+  throw new CompressionError(
+    'Transcript file not found',
+    transcriptPath,
+    'reading'
+  );
+}
+
+// Invalid JSON format
+try {
+  JSON.parse(line);
+} catch (e) {
+  console.warn(`Parse error on line ${i}: ${e.message}`);
+  // Continues processing, logs parse errors
+}
+```
+
+```typescript Analysis Errors
+// Claude SDK connection issues
+try {
+  const response = await query({
+    prompt: analysisPrompt.prompt,
+    options: { /* ... */ }
+  });
+} catch (error) {
+  throw new CompressionError(
+    `Claude analysis failed: ${error.message}`,
+    transcriptPath,
+    'compressing'
+  );
+}
+```
+
+</CodeGroup>
+
+## Performance Optimization
+
+### Token Management
+
+```typescript
+// Automatic chunking for large transcripts
+const needsChunking = chunkManager.needsChunking(conversationText);
+
+if (needsChunking) {
+  // Process in chunks with context overlap
+  const chunks = chunkManager.chunkTranscript(conversationText);
+
+  for (const chunk of chunks) {
+    // Each chunk maintains context continuity
+    await processChunk(chunk);
+  }
+} else {
+  // Single-pass processing for smaller transcripts
+  await processSingleTranscript(conversationText);
+}
+```
+
+### Memory Efficiency
+
+```typescript
+// Large content filtering
+const LARGE_CONTENT_THRESHOLD = 1024 * 1024; // 1MB
+
+if (contentSize > LARGE_CONTENT_THRESHOLD) {
+  const sizeMB = Math.round(contentSize / (1024 * 1024) * 10) / 10;
+  return `[FILTERED: Large content ~${sizeMB}MB]`;
+}
+
+// Stream processing for memory efficiency
+for await (const message of response) {
+  processStreamChunk(message);
+}
+```
+
+## Best Practices
+
+### 1. Project Organization
+
+```typescript
+// Use consistent project naming
+const projectName = PathResolver.getCurrentProjectPrefix();
+const compressor = new TranscriptCompressor();
+
+// This ensures memories are project-scoped
+await compressor.compress(transcriptPath, sessionId, projectName);
+```
+
+### 2. Session Management
+
+```typescript
+// Generate meaningful session IDs
+const sessionId = `${projectName}_${new Date().toISOString().split('T')[0]}_${Math.random().toString(36).substr(2, 9)}`;
+
+// Or use timestamp-based IDs
+const sessionId = `session_${Date.now()}`;
+```
+
+### 3. Error Recovery
+
+```typescript
+// Implement retry logic for transient failures
+async function compressWithRetry(transcriptPath: string, maxRetries = 3): Promise<string> {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await compressor.compress(transcriptPath);
+    } catch (error) {
+      if (attempt === maxRetries) throw error;
+
+      if (error instanceof CompressionError && error.stage === 'compressing') {
+        console.warn(`Attempt ${attempt} failed, retrying in ${attempt * 1000}ms...`);
+        await new Promise(resolve => setTimeout(resolve, attempt * 1000));
+      } else {
+        throw error; // Don't retry for non-transient errors
+      }
+    }
+  }
+}
+```
+
+## Next Steps
+
+- [Memory API](/api-reference/memory-api) - Learn about vector database operations
+- [Hooks API](/api-reference/hooks-api) - Integrate with Claude Code events
+- [API Overview](/api-reference/overview) - General API concepts

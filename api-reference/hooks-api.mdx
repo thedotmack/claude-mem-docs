@@ -1,0 +1,651 @@
+---
+title: "Hooks API"
+description: "Document the hooks system and available hook points"
+---
+
+# Hooks API
+
+The Hooks API provides event-driven integration with Claude Code's lifecycle events. This system allows you to automatically compress transcripts, load context, and respond to various session events.
+
+## Hook System Overview
+
+Claude-mem integrates with Claude Code through a hooks system that responds to specific events:
+
+- **PreCompact** - Before transcript compression
+- **SessionStart** - When a new session begins
+- **SessionEnd** - When a session ends (e.g., `/clear`)
+- **UserPromptSubmit** - When user submits a prompt
+- **PreToolUse** / **PostToolUse** - Before/after tool execution
+- **Notification** - System notifications
+- **Stop** - When processing stops
+
+## Hook Payload Types
+
+### Base Hook Payload
+
+All hooks receive a base payload structure:
+
+```typescript
+interface HookPayload {
+  session_id: string;
+  transcript_path: string;
+  hook_event_name: string;
+}
+```
+
+### Event-Specific Payloads
+
+<CodeGroup>
+
+```typescript PreCompact Hook
+interface PreCompactPayload extends HookPayload {
+  hook_event_name: 'PreCompact';
+  trigger: 'manual' | 'auto';      // How compression was triggered
+  custom_instructions?: string;     // Optional custom instructions
+}
+
+// Example payload
+{
+  "session_id": "session_123",
+  "transcript_path": "/path/to/transcript.jsonl",
+  "hook_event_name": "PreCompact",
+  "trigger": "manual",
+  "custom_instructions": "Focus on API implementation details"
+}
+```
+
+```typescript SessionStart Hook
+interface SessionStartPayload extends HookPayload {
+  hook_event_name: 'SessionStart';
+  source: 'startup' | 'compact' | 'vscode' | 'web';
+  cwd?: string;                    // Current working directory
+}
+
+// Example payload
+{
+  "session_id": "session_456",
+  "transcript_path": "/path/to/new_session.jsonl",
+  "hook_event_name": "SessionStart",
+  "source": "startup",
+  "cwd": "/Users/dev/my-project"
+}
+```
+
+</CodeGroup>
+
+<CodeGroup>
+
+```typescript Tool Use Hooks
+interface PreToolUsePayload extends HookPayload {
+  hook_event_name: 'PreToolUse';
+  tool_name: string;
+  tool_input: Record<string, unknown>;
+}
+
+interface PostToolUsePayload extends HookPayload {
+  hook_event_name: 'PostToolUse';
+  tool_name: string;
+  tool_input: Record<string, unknown>;
+  tool_response: Record<string, unknown> & {
+    success?: boolean;
+  };
+}
+```
+
+```typescript Other Events
+interface UserPromptSubmitPayload extends HookPayload {
+  hook_event_name: 'UserPromptSubmit';
+  prompt: string;
+  cwd: string;
+}
+
+interface NotificationPayload extends HookPayload {
+  hook_event_name: 'Notification';
+  message: string;
+  title?: string;
+}
+
+interface StopPayload extends HookPayload {
+  hook_event_name: 'Stop';
+  stop_hook_active: boolean;
+}
+```
+
+</CodeGroup>
+
+## Hook Response Types
+
+### Base Hook Response
+
+All hooks can return a base response structure:
+
+```typescript
+interface BaseHookResponse {
+  continue?: boolean;        // Whether to continue processing (default: true)
+  stopReason?: string;       // Reason for stopping (if continue: false)
+  suppressOutput?: boolean;  // Whether to suppress output (default: false)
+}
+```
+
+### Event-Specific Responses
+
+<CodeGroup>
+
+```typescript PreCompact Response
+interface PreCompactResponse extends BaseHookResponse {
+  decision?: 'approve' | 'block';  // Compression approval decision
+  reason?: string;                 // Reason for decision
+}
+
+// Example response
+{
+  "continue": true,
+  "decision": "approve",
+  "reason": "Session contains valuable implementation details"
+}
+```
+
+```typescript SessionStart Response
+interface SessionStartResponse extends BaseHookResponse {
+  hookSpecificOutput?: {
+    hookEventName: 'SessionStart';
+    additionalContext?: string;
+  };
+}
+
+// Example response
+{
+  "continue": true,
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "Loaded 15 memories from previous sessions"
+  }
+}
+```
+
+</CodeGroup>
+
+```typescript
+interface PreToolUseResponse extends BaseHookResponse {
+  permissionDecision?: 'allow' | 'deny' | 'ask';  // Tool execution permission
+  permissionDecisionReason?: string;               // Reason for decision
+}
+```
+
+## Built-in Hook Handlers
+
+### PreCompact Hook
+
+Automatically compresses session transcripts before Claude Code compacts them:
+
+```typescript
+import { preCompactHook } from 'claude-mem/commands/hooks';
+
+// Usage in hook script
+export async function preCompactHook(): Promise<void> {
+  // Reads transcript path from stdin (JSON payload)
+  // Automatically runs compression
+  // Creates archive and stores memories
+}
+```
+
+**Hook Script Location**: `hooks/pre-compact.js`
+
+```javascript
+#!/usr/bin/env node
+import { preCompactHook } from 'claude-mem/commands/hooks';
+preCompactHook().catch(error => {
+  console.error('Pre-compact hook failed:', error.message);
+  process.exit(1);
+});
+```
+
+### SessionStart Hook
+
+Loads relevant context at the beginning of new sessions:
+
+```typescript
+import { sessionStartHook } from 'claude-mem/commands/hooks';
+
+// Usage in hook script
+export async function sessionStartHook(): Promise<void> {
+  // Reads session data from stdin
+  // Loads last 10 memories for the project
+  // Displays formatted context to user
+}
+```
+
+**Hook Script Location**: `hooks/session-start.js`
+
+```javascript
+#!/usr/bin/env node
+import { sessionStartHook } from 'claude-mem/commands/hooks';
+sessionStartHook().catch(error => {
+  console.error('Session-start hook failed:', error.message);
+  process.exit(1);
+});
+```
+
+### SessionEnd Hook
+
+Handles session cleanup and optional compression:
+
+```typescript
+import { sessionEndHook } from 'claude-mem/commands/hooks';
+
+// Usage in hook script
+export async function sessionEndHook(): Promise<void> {
+  // Reads session end data from stdin
+  // If reason is "clear", compresses transcript before deletion
+  // Preserves valuable conversation content
+}
+```
+
+**Hook Script Location**: `hooks/session-end.js`
+
+```javascript
+#!/usr/bin/env node
+import { sessionEndHook } from 'claude-mem/commands/hooks';
+sessionEndHook().catch(error => {
+  console.error('Session-end hook failed:', error.message);
+  process.exit(1);
+});
+```
+
+## Hook Configuration
+
+### Installation
+
+Hooks are installed via the `claude-mem install` command:
+
+```bash
+# Install all hooks
+claude-mem install
+
+# Force reinstall (overwrites existing hooks)
+claude-mem install --force
+
+# Check installation status
+claude-mem status
+```
+
+### Hook File Structure
+
+```
+~/.claude/hooks/
+├── pre-compact.js          # PreCompact event handler
+├── session-start.js        # SessionStart event handler
+├── session-end.js          # SessionEnd event handler
+└── shared/
+    ├── hook-helpers.js     # Common utilities
+    ├── config-loader.js    # Configuration loading
+    └── path-resolver.js    # Path resolution
+```
+
+### Shared Utilities
+
+Hook scripts can use shared utilities:
+
+```javascript
+// hooks/shared/hook-helpers.js
+export function validateHookPayload(payload, expectedType) {
+  // Validates incoming hook payload
+}
+
+export function createSuccessResponse(additionalData) {
+  return { continue: true, ...additionalData };
+}
+
+export function createErrorResponse(reason, additionalData) {
+  return { continue: false, stopReason: reason, ...additionalData };
+}
+```
+
+## Custom Hook Development
+
+### Creating Custom Hooks
+
+You can create custom hooks for additional events:
+
+```typescript
+// custom-hooks/my-custom-hook.ts
+import type {
+  HookPayload,
+  BaseHookResponse
+} from 'claude-mem';
+
+interface MyCustomPayload extends HookPayload {
+  hook_event_name: 'MyCustomEvent';
+  customField: string;
+}
+
+export async function myCustomHook(payload: MyCustomPayload): Promise<BaseHookResponse> {
+  try {
+    console.log(`Processing custom event: ${payload.customField}`);
+
+    // Your custom logic here
+    const result = await processCustomEvent(payload);
+
+    return {
+      continue: true,
+      hookSpecificOutput: {
+        processed: true,
+        result: result
+      }
+    };
+  } catch (error) {
+    return {
+      continue: false,
+      stopReason: `Custom hook failed: ${error.message}`
+    };
+  }
+}
+
+async function processCustomEvent(payload: MyCustomPayload) {
+  // Implement your custom logic
+  return { success: true };
+}
+```
+
+### Hook Script Template
+
+```javascript
+#!/usr/bin/env node
+// custom-hooks/my-hook.js
+
+import { validateHookPayload, createSuccessResponse, createErrorResponse } from '../shared/hook-helpers.js';
+
+async function main() {
+  try {
+    // Read payload from stdin
+    let inputData = '';
+    process.stdin.setEncoding('utf8');
+
+    for await (const chunk of process.stdin) {
+      inputData += chunk;
+    }
+
+    if (!inputData) {
+      console.error('No input data received');
+      process.exit(1);
+    }
+
+    // Parse and validate payload
+    const payload = JSON.parse(inputData);
+    validateHookPayload(payload, 'MyCustomEvent');
+
+    // Process the hook
+    const result = await processHook(payload);
+
+    // Output response
+    console.log(JSON.stringify(result));
+
+  } catch (error) {
+    console.error('Hook failed:', error.message);
+    const errorResponse = createErrorResponse(error.message);
+    console.log(JSON.stringify(errorResponse));
+    process.exit(1);
+  }
+}
+
+async function processHook(payload) {
+  // Your hook logic here
+  console.log(`Processing ${payload.hook_event_name} for session ${payload.session_id}`);
+
+  return createSuccessResponse({
+    hookSpecificOutput: {
+      processed: true,
+      timestamp: new Date().toISOString()
+    }
+  });
+}
+
+main();
+```
+
+## Hook Payload Validation
+
+### Built-in Validation
+
+```typescript
+import {
+  validateHookPayload,
+  HookError
+} from 'claude-mem';
+
+try {
+  const validPayload = validateHookPayload(rawPayload, 'PreCompact');
+  // Payload is guaranteed to have required fields
+} catch (error) {
+  if (error instanceof HookError) {
+    console.error(`Validation failed: ${error.message}`);
+    console.error(`Hook type: ${error.hookType}`);
+  }
+}
+```
+
+### Custom Validation
+
+```typescript
+function validateCustomPayload(payload: unknown): MyCustomPayload {
+  const basePayload = validateHookPayload(payload, 'MyCustomEvent');
+
+  if (!('customField' in payload) || typeof payload.customField !== 'string') {
+    throw new HookError(
+      'Missing or invalid customField',
+      'MyCustomEvent',
+      basePayload
+    );
+  }
+
+  return payload as MyCustomPayload;
+}
+```
+
+## Error Handling
+
+### HookError Class
+
+```typescript
+class HookError extends Error {
+  constructor(
+    message: string,
+    public hookType: string,
+    public payload?: HookPayload,
+    public code?: string
+  )
+}
+```
+
+### Error Response Format
+
+```typescript
+// Error response structure
+{
+  "continue": false,
+  "stopReason": "Hook execution failed: Invalid payload format",
+  "suppressOutput": false
+}
+```
+
+### Best Practices
+
+<CodeGroup>
+
+```typescript Graceful Error Handling
+export async function robustHook(payload: HookPayload): Promise<BaseHookResponse> {
+  try {
+    // Validate payload
+    const validatedPayload = validateHookPayload(payload, 'ExpectedType');
+
+    // Process hook
+    const result = await processHook(validatedPayload);
+
+    return createSuccessResponse({ result });
+
+  } catch (error) {
+    // Log error for debugging
+    console.error('Hook error:', error);
+
+    // Return graceful error response
+    return createErrorResponse(
+      `Hook processing failed: ${error.message}`
+    );
+  }
+}
+```
+
+```typescript Timeout Handling
+import { setTimeout } from 'timers/promises';
+
+async function hookWithTimeout(payload: HookPayload, timeoutMs = 30000): Promise<BaseHookResponse> {
+  try {
+    const result = await Promise.race([
+      processHook(payload),
+      setTimeout(timeoutMs).then(() => {
+        throw new Error('Hook execution timed out');
+      })
+    ]);
+
+    return createSuccessResponse({ result });
+
+  } catch (error) {
+    if (error.message.includes('timed out')) {
+      return createErrorResponse('Hook execution timed out');
+    }
+    return createErrorResponse(`Hook failed: ${error.message}`);
+  }
+}
+```
+
+</CodeGroup>
+
+## Integration Examples
+
+### With TranscriptCompressor
+
+```typescript
+// In a PreCompact hook
+import { TranscriptCompressor } from 'claude-mem';
+
+export async function preCompactHook(): Promise<void> {
+  const payload = await readStdinPayload() as PreCompactPayload;
+
+  const compressor = new TranscriptCompressor({
+    verbose: false
+  });
+
+  try {
+    const archivePath = await compressor.compress(
+      payload.transcript_path,
+      payload.session_id
+    );
+
+    console.log(`✅ Session compressed: ${archivePath}`);
+
+    // Return success response
+    const response = createSuccessResponse({
+      hookSpecificOutput: {
+        archivePath,
+        compressed: true
+      }
+    });
+
+    console.log(JSON.stringify(response));
+
+  } catch (error) {
+    const errorResponse = createErrorResponse(
+      `Compression failed: ${error.message}`
+    );
+    console.log(JSON.stringify(errorResponse));
+    process.exit(1);
+  }
+}
+```
+
+### With Memory API
+
+```typescript
+// In a SessionStart hook
+import { loadContext } from 'claude-mem/commands';
+
+export async function sessionStartHook(): Promise<void> {
+  const payload = await readStdinPayload() as SessionStartPayload;
+
+  // Extract project name from working directory
+  const project = payload.cwd ? basename(payload.cwd) : undefined;
+
+  try {
+    // Load context for the project
+    await loadContext({
+      format: 'session-start',
+      count: '10',
+      project
+    });
+
+    const response = createSuccessResponse({
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext: `Loaded memories for project: ${project || 'default'}`
+      }
+    });
+
+    console.log(JSON.stringify(response));
+
+  } catch (error) {
+    // Even if context loading fails, allow session to continue
+    const response = createSuccessResponse({
+      hookSpecificOutput: {
+        hookEventName: 'SessionStart',
+        additionalContext: 'No previous memories found'
+      }
+    });
+
+    console.log(JSON.stringify(response));
+  }
+}
+```
+
+## Testing Hooks
+
+### Manual Testing
+
+```bash
+# Test PreCompact hook manually
+echo '{"session_id":"test_session","transcript_path":"/path/to/test.jsonl","hook_event_name":"PreCompact","trigger":"manual"}' | node hooks/pre-compact.js
+
+# Test SessionStart hook
+echo '{"session_id":"test_session","transcript_path":"/path/to/test.jsonl","hook_event_name":"SessionStart","source":"startup","cwd":"/Users/dev/project"}' | node hooks/session-start.js
+```
+
+### Automated Testing
+
+```typescript
+// test/hooks.test.ts
+import { describe, it, expect } from 'your-test-framework';
+import { preCompactHook } from '../src/commands/hooks';
+
+describe('Hook System', () => {
+  it('should handle PreCompact payload correctly', async () => {
+    const mockPayload: PreCompactPayload = {
+      session_id: 'test_session',
+      transcript_path: '/path/to/test.jsonl',
+      hook_event_name: 'PreCompact',
+      trigger: 'manual'
+    };
+
+    // Mock stdin
+    process.stdin.push(JSON.stringify(mockPayload));
+    process.stdin.push(null);
+
+    // Test hook execution
+    await expect(preCompactHook()).resolves.not.toThrow();
+  });
+});
+```
+
+## Next Steps
+
+- [Memory API](/api-reference/memory-api) - Learn about vector database operations
+- [Compression API](/api-reference/compression-api) - Understand transcript processing
+- [API Overview](/api-reference/overview) - General API concepts

@@ -1,0 +1,661 @@
+---
+title: "Contributing to Claude Memory"
+description: "Complete guide for developers who want to contribute to the claude-mem project"
+---
+
+# Contributing to Claude Memory
+
+Welcome to the claude-mem development guide! Whether you're fixing a bug, adding a feature, or improving documentation, this guide will help you contribute effectively to the project.
+
+## Project Overview
+
+claude-mem is a TypeScript CLI tool that provides persistent memory for Claude Code sessions through:
+
+- **Session Compression**: Converts conversation transcripts into structured memories
+- **Context Loading**: Retrieves relevant memories for new sessions
+- **Vector Search**: Uses ChromaDB for semantic memory retrieval
+- **Claude Code Integration**: Seamless hooks for automatic operation
+- **Smart Trash System**: Safe deletion with recovery capabilities
+
+<CardGrid>
+  <Card title="Architecture" icon="building">
+    **Modular Design**
+    - CLI commands in `/src/commands/`
+    - Core logic in `/src/core/`
+    - Templates in `/src/prompts/templates/`
+    - Hooks in `/hooks/`
+  </Card>
+  <Card title="Tech Stack" icon="code">
+    **Technologies**
+    - TypeScript + Node.js 18+
+    - Bun for build tooling
+    - ChromaDB for vector storage
+    - Commander.js for CLI
+    - Claude Code MCP integration
+  </Card>
+  <Card title="Distribution" icon="package">
+    **Release Process**
+    - Source code in `/src/`
+    - Minified bundle in `/dist/`
+    - NPM package in `/releases/npm-package/`
+    - Documentation website
+  </Card>
+</CardGrid>
+
+## Development Environment Setup
+
+<Steps>
+  <Step title="Prerequisites">
+    Ensure you have the required tools:
+
+    ```bash
+    # Required
+    node --version  # >= 18.0.0
+    bun --version   # >= 1.0.0 (preferred) or npm
+
+    # Recommended
+    git --version
+    code --version  # VS Code or your preferred editor
+    ```
+
+    <Note>
+      **Bun vs NPM**: While the project works with both, Bun is preferred for development due to faster installation and builds.
+    </Note>
+  </Step>
+
+  <Step title="Clone and Setup">
+    ```bash
+    # Clone the repository
+    git clone https://github.com/thedotmack/claude-mem.git
+    cd claude-mem
+
+    # Install dependencies
+    bun install
+
+    # Verify setup
+    bun run dev --version
+    ```
+  </Step>
+
+  <Step title="Build System">
+    ```bash
+    # Build minified bundle
+    bun run build
+
+    # Run in development mode
+    bun run dev status
+
+    # Build for npm distribution
+    bun run build:npm
+    ```
+  </Step>
+
+  <Step title="Local Testing">
+    ```bash
+    # Link for local testing
+    bun link
+
+    # Use local version globally
+    bun link claude-mem
+
+    # Test local installation
+    claude-mem --version
+    claude-mem status
+    ```
+  </Step>
+</Steps>
+
+## Project Structure
+
+Understanding the codebase organization:
+
+```
+claude-mem/
+├── src/                    # TypeScript source code
+│   ├── bin/cli.ts         # Main CLI entry point
+│   ├── commands/          # CLI command implementations
+│   ├── core/              # Core business logic
+│   ├── services/          # External service integrations
+│   ├── prompts/templates/ # LLM prompt templates
+│   └── shared/            # Utilities and constants
+├── hooks/                 # Claude Code integration hooks
+├── releases/npm-package/  # NPM distribution package
+├── scripts/               # Build and deployment scripts
+├── dist/                  # Compiled output
+└── docs/                  # Documentation source
+```
+
+### Key Directories Explained
+
+<AccordionGroup>
+  <Accordion title="/src/commands/ - CLI Command Logic">
+    Each command is a separate TypeScript file:
+
+    ```typescript
+    // src/commands/status.ts
+    export async function status(options: OptionValues): Promise<void> {
+      // Implementation
+    }
+    ```
+
+    **Key Files**:
+    - `install.ts` - Hook installation and setup
+    - `load-context.ts` - Memory retrieval and formatting
+    - `compress.ts` - Transcript compression
+    - `trash.ts` - Safe deletion system
+  </Accordion>
+
+  <Accordion title="/src/core/ - Business Logic">
+    Core compression and memory management:
+
+    ```
+    core/
+    ├── compression/           # Transcript analysis and compression
+    ├── memory/               # Memory storage and retrieval
+    ├── hooks/                # Hook execution logic
+    └── services/             # External service clients
+    ```
+
+    **Critical Components**:
+    - `TranscriptCompressor.ts` - Main compression engine
+    - `MemoryManager.ts` - Memory CRUD operations
+    - `ChromaClient.ts` - Vector database interface
+  </Accordion>
+
+  <Accordion title="/src/prompts/templates/ - LLM Prompts">
+    Modular template system for LLM interactions:
+
+    ```typescript
+    // AnalysisTemplates.ts - Compression prompts
+    export function buildCompleteAnalysisPrompt(...): string;
+
+    // HookTemplates.ts - Claude Code integration
+    export function createSessionStartResponse(...): HookResponse;
+
+    // ContextTemplates.ts - User-facing messages
+    export function createCompletionMessage(...): string;
+    ```
+  </Accordion>
+
+  <Accordion title="/hooks/ - Claude Code Integration">
+    Shell scripts that integrate with Claude Code:
+
+    ```bash
+    hooks/
+    ├── session-start.sh    # Load context at session start
+    ├── session-end.sh      # Compress transcript at session end
+    └── pre-compact.sh      # Pre-compression validation
+    ```
+
+    These scripts call the compiled CLI with specific commands.
+  </Accordion>
+</AccordionGroup>
+
+## Development Workflow
+
+### Making Changes
+
+<Steps>
+  <Step title="Create Feature Branch">
+    ```bash
+    git checkout -b feature/your-feature-name
+    # or
+    git checkout -b fix/issue-description
+    ```
+  </Step>
+
+  <Step title="Development Cycle">
+    ```bash
+    # Make changes to TypeScript files
+    vim src/commands/your-feature.ts
+
+    # Test in development mode
+    bun run dev your-feature --test-flag
+
+    # Build and test minified version
+    bun run build
+    node dist/claude-mem.min.js your-feature --test-flag
+    ```
+  </Step>
+
+  <Step title="Local Integration Testing">
+    ```bash
+    # Test with local Claude Code installation
+    bun run dev install --force
+    # Start Claude Code session to test integration
+
+    # Reset to clean state
+    bun run dev uninstall
+    ```
+  </Step>
+
+  <Step title="Code Quality Checks">
+    ```bash
+    # Lint code
+    bun run lint
+
+    # Fix linting issues
+    bun run lint:fix
+
+    # Format code
+    bun run format
+    ```
+  </Step>
+</Steps>
+
+### Testing Strategies
+
+<AccordionGroup>
+  <Accordion title="Unit Testing">
+    Test individual functions and modules:
+
+    ```typescript
+    // Example: Testing memory compression
+    import { TranscriptCompressor } from '../src/core/compression/TranscriptCompressor.js';
+
+    const compressor = new TranscriptCompressor();
+    const result = await compressor.compress(mockTranscript);
+    // Verify result structure and content
+    ```
+  </Accordion>
+
+  <Accordion title="Integration Testing">
+    Test complete command flows:
+
+    ```bash
+    # Test compression pipeline
+    echo '{"messages":[...]}' > test-transcript.json
+    bun run dev compress test-transcript.json --dry-run
+
+    # Test context loading
+    bun run dev load-context --project test-project
+    ```
+  </Accordion>
+
+  <Accordion title="Hook Testing">
+    Test Claude Code integration:
+
+    ```bash
+    # Test session start hook
+    echo '{"source":"manual"}' | ./hooks/session-start.sh
+
+    # Test session end hook
+    echo '{"transcriptPath":"/path/to/transcript.json"}' | ./hooks/session-end.sh
+    ```
+  </Accordion>
+
+  <Accordion title="Memory System Testing">
+    Verify memory operations:
+
+    ```bash
+    # Create test memories
+    bun run dev save "Test memory for development"
+
+    # Verify storage
+    cat ~/.claude-mem/index/index.jsonl | tail -1
+
+    # Test retrieval
+    bun run dev load-context --format json
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Common Development Tasks
+
+### Adding a New CLI Command
+
+<Steps>
+  <Step title="Create Command File">
+    ```typescript
+    // src/commands/my-command.ts
+    import { OptionValues } from 'commander';
+
+    export async function myCommand(options: OptionValues = {}): Promise<void> {
+      console.log('Executing my command');
+      // Implementation
+    }
+    ```
+  </Step>
+
+  <Step title="Register in CLI">
+    ```typescript
+    // src/bin/cli.ts
+    import { myCommand } from '../commands/my-command.js';
+
+    program
+      .command('my-command')
+      .description('Description of my command')
+      .option('--flag', 'Command flag')
+      .action(myCommand);
+    ```
+  </Step>
+
+  <Step title="Test and Build">
+    ```bash
+    # Test in development
+    bun run dev my-command --flag
+
+    # Build and test minified
+    bun run build
+    node dist/claude-mem.min.js my-command --flag
+    ```
+  </Step>
+</Steps>
+
+### Modifying Memory Compression
+
+The compression system uses LLM prompts to analyze transcripts:
+
+<Steps>
+  <Step title="Update Analysis Templates">
+    ```typescript
+    // src/prompts/templates/AnalysisTemplates.ts
+    export function createEntityExtractionInstructions(projectPrefix: string): string {
+      return `
+        Extract technical entities from the conversation...
+        Focus on: ${projectPrefix}-specific patterns...
+      `;
+    }
+    ```
+  </Step>
+
+  <Step title="Modify Compression Logic">
+    ```typescript
+    // src/core/compression/TranscriptCompressor.ts
+    async compress(transcript: any): Promise<CompressionResult> {
+      // Update compression algorithm
+      const prompt = buildCompleteAnalysisPrompt(...);
+      const result = await this.llmClient.analyze(prompt);
+      return this.processResult(result);
+    }
+    ```
+  </Step>
+
+  <Step title="Test Compression">
+    ```bash
+    # Test with sample transcript
+    bun run dev compress sample-transcript.json --verbose
+
+    # Verify output quality
+    bun run dev load-context --format json | jq .
+    ```
+  </Step>
+</Steps>
+
+### Adding New Memory Features
+
+<Steps>
+  <Step title="Extend Memory Schema">
+    ```typescript
+    // Update memory data structures
+    interface MemoryEntry {
+      text: string;
+      project: string;
+      timestamp: string;
+      type: 'memory' | 'overview' | 'decision';  // Add new types
+      metadata?: {
+        confidence?: number;  // Add new fields
+        tags?: string[];
+      };
+    }
+    ```
+  </Step>
+
+  <Step title="Update Storage Logic">
+    ```typescript
+    // src/core/memory/MemoryManager.ts
+    async saveMemory(entry: MemoryEntry): Promise<void> {
+      // Validate new fields
+      // Update storage format
+      // Handle backwards compatibility
+    }
+    ```
+  </Step>
+
+  <Step title="Update Context Loading">
+    ```typescript
+    // src/commands/load-context.ts
+    // Handle new memory types in filtering and display
+    const memories = jsonObjects.filter(obj =>
+      obj.type === 'memory' || obj.type === 'decision'  // Include new types
+    );
+    ```
+  </Step>
+</Steps>
+
+## Code Quality Guidelines
+
+### TypeScript Best Practices
+
+```typescript
+// ✅ Good: Explicit types and error handling
+export async function processMemory(
+  memory: MemoryEntry,
+  options: ProcessingOptions
+): Promise<ProcessingResult> {
+  try {
+    const result = await this.processor.process(memory);
+    return { success: true, data: result };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    };
+  }
+}
+
+// ❌ Avoid: Implicit any types and unhandled errors
+export async function processMemory(memory, options) {
+  const result = await this.processor.process(memory);
+  return result;
+}
+```
+
+### Error Handling Patterns
+
+```typescript
+// ✅ User-friendly error messages
+try {
+  await operation();
+} catch (error) {
+  const userMessage = createUserFriendlyError(
+    'Memory loading',
+    error.message,
+    'Check your installation and try again'
+  );
+  console.log(userMessage);
+  process.exit(1);
+}
+
+// ✅ Graceful degradation
+try {
+  const memories = await loadMemories();
+  return memories;
+} catch (error) {
+  debugLog('Memory loading failed, continuing without context', error);
+  return [];
+}
+```
+
+### CLI Command Patterns
+
+```typescript
+// ✅ Consistent command structure
+export async function myCommand(options: OptionValues = {}): Promise<void> {
+  try {
+    // Validate inputs
+    if (!validateOptions(options)) {
+      console.error('Invalid options provided');
+      return;
+    }
+
+    // Show progress for long operations
+    console.log('Processing...');
+
+    // Perform operation
+    const result = await performOperation(options);
+
+    // Provide clear feedback
+    console.log(createCompletionMessage('Operation', result.count, 'items processed'));
+
+  } catch (error) {
+    console.error(createUserFriendlyError('Operation', error.message, 'Try again with --verbose'));
+  }
+}
+```
+
+## Release Process
+
+### Testing Before Release
+
+<Steps>
+  <Step title="Local Testing">
+    ```bash
+    # Test all major commands
+    bun run dev install --force
+    bun run dev status
+    bun run dev save "Test memory"
+    bun run dev load-context
+    bun run dev uninstall
+    ```
+  </Step>
+
+  <Step title="Integration Testing">
+    ```bash
+    # Test with real Claude Code session
+    bun run dev install --force
+    # Start Claude Code, have conversation, verify memory creation
+    bun run dev load-context  # Verify memories loaded
+    ```
+  </Step>
+
+  <Step title="Build Testing">
+    ```bash
+    # Test production build
+    bun run build
+    node dist/claude-mem.min.js status
+    node dist/claude-mem.min.js install --force
+    ```
+  </Step>
+</Steps>
+
+### Version Management
+
+```bash
+# Update version in package.json
+npm version patch  # or minor, major
+
+# Build and publish
+bun run publish:latest
+```
+
+## Debugging Techniques
+
+### Development Debugging
+
+```bash
+# Enable debug logging
+export CLAUDE_MEM_DEBUG=1
+
+# Run with verbose output
+bun run dev command --verbose
+
+# Check detailed logs
+bun run dev logs --debug --tail 100
+```
+
+### Hook Debugging
+
+```bash
+# Test hooks in isolation
+echo '{"source":"test"}' | ./hooks/session-start.sh
+
+# Check hook output and exit codes
+echo $?  # Should be 0 for success
+
+# View hook logs
+tail -f ~/.claude-mem/logs/hooks.log
+```
+
+### Memory System Debugging
+
+```bash
+# Inspect memory index
+head -10 ~/.claude-mem/index/index.jsonl | jq .
+
+# Check Chroma database
+ls -la ~/.claude-mem/chroma/
+
+# Test compression manually
+bun run dev debug-filter path/to/transcript.json
+```
+
+## Contributing Guidelines
+
+### Pull Request Process
+
+<Steps>
+  <Step title="Before Submitting">
+    - [ ] All tests pass locally
+    - [ ] Code follows style guidelines
+    - [ ] Documentation updated if needed
+    - [ ] Breaking changes are documented
+  </Step>
+
+  <Step title="PR Description">
+    Include:
+    - Clear description of changes
+    - Motivation and context
+    - Testing performed
+    - Screenshots if UI changes
+    - Related issue numbers
+  </Step>
+
+  <Step title="Review Process">
+    - Automated checks must pass
+    - Code review by maintainers
+    - Integration testing
+    - Documentation review
+  </Step>
+</Steps>
+
+### Issue Reporting
+
+When reporting bugs or requesting features:
+
+- **Bug Reports**: Include steps to reproduce, expected vs actual behavior, system info
+- **Feature Requests**: Describe use case, proposed solution, alternatives considered
+- **Documentation Issues**: Specify what's unclear or missing
+
+## Getting Help
+
+<CardGrid>
+  <Card title="Code Questions" icon="code">
+    **Architecture & Implementation**
+    - Review existing code patterns
+    - Check template system in `/src/prompts/templates/`
+    - Study command implementations in `/src/commands/`
+  </Card>
+  <Card title="Integration Issues" icon="plug">
+    **Claude Code Integration**
+    - Test hooks manually
+    - Check Claude Code hook specification
+    - Review session flow in `/hooks/`
+  </Card>
+  <Card title="Build Problems" icon="wrench">
+    **Build & Distribution**
+    - Check Node.js/Bun versions
+    - Review build scripts in `/scripts/`
+    - Test with clean environment
+  </Card>
+  <Card title="Memory System" icon="brain">
+    **Memory & Compression**
+    - Study `TranscriptCompressor.ts`
+    - Review template system
+    - Test with sample transcripts
+  </Card>
+</CardGrid>
+
+---
+
+Ready to contribute? Start by exploring the codebase, setting up your development environment, and looking for issues labeled "good first issue" or "help wanted" in the repository.

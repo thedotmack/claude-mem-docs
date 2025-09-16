@@ -1,0 +1,166 @@
+---
+title: "API Overview"
+description: "Overview of claude-mem APIs and how to use them programmatically"
+---
+
+# API Overview
+
+Claude-mem provides a comprehensive set of APIs for integrating memory compression and transcript processing into your applications. This guide covers the main API surfaces and how to use them programmatically.
+
+## Core API Components
+
+### 1. Memory Storage & Retrieval APIs
+
+Claude-mem uses the Model Context Protocol (MCP) for memory operations, providing a standardized interface for vector database operations through ChromaDB.
+
+**Key Features:**
+- Document storage and retrieval
+- Semantic search capabilities
+- Collection management
+- Metadata filtering
+
+### 2. Compression APIs
+
+The compression system transforms Claude Code conversation transcripts into searchable memory documents.
+
+**Key Features:**
+- Transcript parsing and analysis
+- Intelligent chunking for large conversations
+- Token-aware compression
+- Archive management
+
+### 3. Hooks System
+
+Event-driven hooks that integrate with Claude Code's lifecycle events.
+
+**Key Features:**
+- Session lifecycle events
+- Pre/post tool execution hooks
+- Custom hook development
+- Payload validation
+
+### 4. Configuration & Settings
+
+Centralized configuration management for paths, settings, and project detection.
+
+**Key Features:**
+- Settings persistence
+- Project-aware configurations
+- Path resolution utilities
+- Environment detection
+
+## Getting Started
+
+### Installation
+
+```bash
+npm install claude-mem
+```
+
+### Basic Usage
+
+```typescript
+import { TranscriptCompressor, SettingsManager } from 'claude-mem';
+
+// Initialize compressor
+const compressor = new TranscriptCompressor({
+  verbose: true
+});
+
+// Compress a transcript
+const archivePath = await compressor.compress('/path/to/transcript.jsonl');
+console.log(`Archive created: ${archivePath}`);
+```
+
+## API Architecture
+
+Claude-mem follows a layered architecture:
+
+```
+┌─────────────────────┐
+│   CLI Commands      │  ← User-facing commands
+├─────────────────────┤
+│   Core Services     │  ← Business logic (Compression, Orchestration)
+├─────────────────────┤
+│   Shared Utilities  │  ← Settings, Paths, Types
+├─────────────────────┤
+│   MCP Integration   │  ← Memory operations via ChromaDB
+└─────────────────────┘
+```
+
+### Key Classes
+
+| Class | Purpose | Location |
+|-------|---------|----------|
+| `TranscriptCompressor` | Main compression engine | `/core/compression/` |
+| `PromptOrchestrator` | Prompt generation | `/core/orchestration/` |
+| `ChunkManager` | Large transcript handling | `/core/compression/` |
+| `SettingsManager` | Configuration management | `/shared/` |
+| `PathResolver` | File system paths | `/shared/` |
+
+## Authentication & Configuration
+
+### Settings File
+
+Claude-mem stores configuration in `~/.claude-mem/settings.json`:
+
+```json
+{
+  "autoCompress": true,
+  "projectName": "my-project",
+  "claudePath": "/usr/local/bin/claude",
+  "backend": "chroma",
+  "saveMemoriesOnClear": true
+}
+```
+
+### Environment Variables
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `CLAUDE_PATH` | Path to Claude Code executable | `claude` |
+| `TRANSCRIPT_PATH` | Transcript file path (hooks) | - |
+| `DEBUG` | Enable debug logging | `false` |
+
+## Error Handling
+
+All APIs use typed error classes:
+
+```typescript
+import { CompressionError, HookError } from 'claude-mem';
+
+try {
+  await compressor.compress(transcriptPath);
+} catch (error) {
+  if (error instanceof CompressionError) {
+    console.error(`Compression failed at stage: ${error.stage}`);
+  } else if (error instanceof HookError) {
+    console.error(`Hook error in: ${error.hookType}`);
+  }
+}
+```
+
+## TypeScript Support
+
+Claude-mem is written in TypeScript with full type definitions included:
+
+```typescript
+import type {
+  CompressionOptions,
+  AnalysisContext,
+  HookPayload,
+  Settings
+} from 'claude-mem';
+```
+
+## Next Steps
+
+- [Memory API Reference](/api-reference/memory-api) - Vector database operations
+- [Compression API Reference](/api-reference/compression-api) - Transcript processing
+- [Hooks API Reference](/api-reference/hooks-api) - Event system integration
+
+## Support
+
+For questions and issues:
+- [GitHub Issues](https://github.com/thedotmack/claude-mem/issues)
+- [Documentation](https://claude-mem.vercel.app)

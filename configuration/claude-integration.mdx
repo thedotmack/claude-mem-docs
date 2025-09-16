@@ -1,0 +1,568 @@
+---
+title: "Claude Code Integration"
+description: "How claude-mem integrates with Claude Code CLI for seamless memory management"
+---
+
+## Overview
+
+Claude-mem provides seamless integration with Claude Code through an advanced hook system and MCP (Model Context Protocol) server. This integration enables automatic memory compression, context loading, and intelligent session management without disrupting your workflow.
+
+## Integration Architecture
+
+<Tabs>
+  <Tab title="High-Level Flow">
+    ```mermaid
+    graph LR
+        A[Claude Code] --> B[Session Start Hook]
+        B --> C[Load Context]
+        C --> D[Active Session]
+        D --> E[Session End/Clear]
+        E --> F[PreCompact Hook]
+        F --> G[Compress Memory]
+        G --> H[Chroma Storage]
+    ```
+  </Tab>
+  <Tab title="Hook System">
+    ```mermaid
+    graph TD
+        A[Claude Code Events] --> B{Hook Type}
+        B -->|SessionStart| C[session-start.js]
+        B -->|PreCompact| D[pre-compact.js]
+        B -->|SessionEnd| E[session-end.js]
+        C --> F[Load Previous Context]
+        D --> G[Compress Current Session]
+        E --> H[Save Memories on Clear]
+    ```
+  </Tab>
+</Tabs>
+
+## Integration Components
+
+### 1. Hook System
+Claude-mem integrates through Claude Code's native hook system, providing:
+- **Automatic trigger**: Hooks execute at specific Claude Code lifecycle events
+- **Non-blocking operation**: Hooks run independently without interrupting your session
+- **Error tolerance**: Failed hooks don't break Claude Code functionality
+
+### 2. MCP Server Integration
+- **Chroma MCP Server**: Provides vector database functionality
+- **Semantic search**: Enables intelligent context retrieval
+- **Document storage**: Manages compressed memories efficiently
+
+### 3. CLI Commands
+- **Direct invocation**: Hooks use claude-mem CLI commands
+- **Standardized responses**: Consistent JSON communication format
+- **Timeout handling**: Graceful handling of long-running operations
+
+## Installation Process
+
+### Automatic Installation
+```bash
+# Install with interactive wizard
+claude-mem install
+
+# Force reinstall (updates existing installation)
+claude-mem install --force
+
+# Install to specific scope
+claude-mem install --user    # Global settings
+claude-mem install --project # Project-specific
+claude-mem install --local   # Custom directory
+```
+
+### Installation Scopes
+
+<Tabs>
+  <Tab title="User Scope (Recommended)">
+    ```bash
+    # Installs to global Claude Code settings
+    claude-mem install --user
+
+    # Settings location:
+    ~/.claude/settings.json
+
+    # Hook scripts location:
+    ~/.claude-mem/hooks/
+    ```
+  </Tab>
+  <Tab title="Project Scope">
+    ```bash
+    # Installs to current project only
+    claude-mem install --project
+
+    # Settings location:
+    ./project/.claude/settings.json
+
+    # Uses global hook scripts
+    ```
+  </Tab>
+  <Tab title="Local Scope">
+    ```bash
+    # Custom installation directory
+    claude-mem install --local --path /custom/path
+
+    # Settings location:
+    /custom/path/settings.json
+
+    # Hook scripts location:
+    /custom/path/hooks/
+    ```
+  </Tab>
+</Tabs>
+
+## Hook Configuration
+
+### Settings File Structure
+Claude-mem modifies Claude Code's `settings.json` file to register hooks:
+
+```json
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/username/.claude-mem/hooks/pre-compact.js",
+            "timeout": 180000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/username/.claude-mem/hooks/session-start.js"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/Users/username/.claude-mem/hooks/session-end.js",
+            "timeout": 180000
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Hook Execution Flow
+
+<Tabs>
+  <Tab title="Session Start">
+    ```
+    1. Claude Code starts new session
+    2. Triggers SessionStart hook
+    3. Hook loads project context via:
+       claude-mem load-context --project current-project
+    4. Context displayed in Claude Code
+    5. Session begins with full context
+    ```
+  </Tab>
+  <Tab title="PreCompact">
+    ```
+    1. User runs /compact in Claude Code
+    2. Triggers PreCompact hook before compression
+    3. Hook compresses transcript via:
+       claude-mem compress /path/to/transcript
+    4. Claude Code continues with compression
+    5. Session history preserved in memory
+    ```
+  </Tab>
+  <Tab title="Session End">
+    ```
+    1. User runs /clear or session ends
+    2. Triggers SessionEnd hook
+    3. If saveMemoriesOnClear enabled:
+       - Compresses current session
+       - Saves to memory archive
+    4. Claude Code clears session
+    ```
+  </Tab>
+</Tabs>
+
+## Context Loading
+
+### Automatic Context Injection
+When starting a new session, claude-mem automatically:
+
+1. **Detects project name** from current working directory
+2. **Queries memory database** for relevant context
+3. **Formats context** for optimal Claude Code display
+4. **Injects context** as additional session context
+
+### Context Format Examples
+
+<Tabs>
+  <Tab title="Rich Context">
+    ```
+    🧠 Loaded 15 memories from previous sessions for my-project (last worked: 2025-01-15)
+
+    🎯 Recent components: UserAuthentication, DatabaseManager, APIRouter
+
+    🔄 Recent decisions: Switched to TypeScript, Added Redis caching
+
+    💡 Use search_nodes("keywords") to find related work or open_nodes(["entity_name"]) to load specific components
+    ```
+  </Tab>
+  <Tab title="Minimal Context">
+    ```
+    🧠 Loaded 3 memories from previous sessions for new-project
+
+    💡 Use search_nodes("keywords") to find related work
+    ```
+  </Tab>
+  <Tab title="No Context">
+    ```
+    Context loading encountered an issue: No previous memories found for this project. Starting without previous context.
+    ```
+  </Tab>
+</Tabs>
+
+## Memory Compression
+
+### Automatic Compression
+Claude-mem automatically compresses transcripts using:
+
+1. **Intelligent chunking**: Breaks large transcripts into manageable segments
+2. **Semantic analysis**: Identifies key components, decisions, and patterns
+3. **Vector embedding**: Creates searchable memory representations
+4. **Storage optimization**: Compresses and archives original transcripts
+
+### Compression Triggers
+
+<Tabs>
+  <Tab title="Manual Trigger">
+    ```bash
+    # User initiates via Claude Code
+    /compact
+
+    # Direct CLI usage
+    claude-mem compress [transcript-file]
+    ```
+  </Tab>
+  <Tab title="Automatic Trigger">
+    ```bash
+    # Settings configuration
+    {
+      "autoCompress": true,
+      "saveMemoriesOnClear": true
+    }
+
+    # Environment variable
+    export CLAUDE_MEM_AUTO_COMPRESS=true
+    ```
+  </Tab>
+</Tabs>
+
+## Error Handling
+
+### Graceful Degradation
+Claude-mem is designed to fail gracefully:
+
+```javascript
+// Hook error handling pattern
+try {
+  const result = await executeClaudeMemCommand();
+  return successResponse(result);
+} catch (error) {
+  // Log error but don't block Claude Code
+  return continueResponse();
+}
+```
+
+### Common Error Scenarios
+
+<Tabs>
+  <Tab title="Hook Timeout">
+    ```json
+    {
+      "continue": false,
+      "stopReason": "Hook execution timeout",
+      "suppressOutput": true
+    }
+    ```
+  </Tab>
+  <Tab title="Memory Loading Error">
+    ```json
+    {
+      "continue": true,
+      "suppressOutput": true,
+      "hookSpecificOutput": {
+        "hookEventName": "SessionStart",
+        "additionalContext": "Context loading encountered an issue: Database connection failed. Starting without previous context."
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Compression Failure">
+    ```json
+    {
+      "continue": false,
+      "stopReason": "Compression failed: disk full",
+      "suppressOutput": true
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Performance Optimization
+
+### Reducing Integration Overhead
+
+<Tabs>
+  <Tab title="Hook Performance">
+    ```javascript
+    // Async execution pattern
+    executeCliCommand('claude-mem', ['compress'])
+      .catch(error => debugLog('Compression failed', error));
+
+    // Quick exit for invalid conditions
+    if (payload.source === 'resume') {
+      process.exit(0);
+    }
+    ```
+  </Tab>
+  <Tab title="Context Loading">
+    ```bash
+    # Limit context size
+    claude-mem load-context --limit 10 --format brief
+
+    # Project-specific loading
+    claude-mem load-context --project ${PROJECT_NAME}
+    ```
+  </Tab>
+</Tabs>
+
+### Memory Usage
+- **Streaming operations**: Large files processed in chunks
+- **Separate processes**: Hooks run independently of Claude Code
+- **Cleanup**: Temporary files automatically removed
+
+## Debugging Integration
+
+### Enable Debug Mode
+```bash
+# Environment variable
+export CLAUDE_MEM_DEBUG=true
+
+# View hook execution logs
+claude-mem logs --debug
+
+# Test hooks manually
+echo '{"session_id":"test","transcript_path":"/tmp/test","hook_event_name":"SessionStart"}' | ~/.claude-mem/hooks/session-start.js
+```
+
+### Debug Output Examples
+
+<Tabs>
+  <Tab title="Hook Debug">
+    ```
+    [2025-01-15T10:30:45.123Z] HOOK DEBUG: Session start hook started {
+      payload: {
+        session_id: "abc123",
+        transcript_path: "/home/user/.claude/projects/myproject/transcript.jsonl",
+        hook_event_name: "SessionStart",
+        source: "startup"
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="CLI Debug">
+    ```
+    [2025-01-15T10:30:46.456Z] CLI DEBUG: Loading context for project: myproject
+    [2025-01-15T10:30:46.789Z] CLI DEBUG: Found 15 memory documents
+    [2025-01-15T10:30:47.012Z] CLI DEBUG: Context formatted successfully
+    ```
+  </Tab>
+</Tabs>
+
+## Integration Status
+
+### Check Installation Status
+```bash
+# Comprehensive status check
+claude-mem status
+
+# Verify hook registration
+cat ~/.claude/settings.json | jq .hooks
+
+# Test specific hook
+claude-mem test-hook session-start
+```
+
+### Status Output Example
+```
+🔍 Claude Memory System Status Check
+=====================================
+
+📂 Installed Hook Scripts:
+  ✅ pre-compact.js: Found at /Users/username/.claude-mem/hooks/pre-compact.js
+  ✅ session-start.js: Found at /Users/username/.claude-mem/hooks/session-start.js
+  ✅ session-end.js: Found at /Users/username/.claude-mem/hooks/session-end.js
+
+⚙️ Settings Configuration:
+  📋 Global: /Users/username/.claude/settings.json
+     PreCompact: ✅
+     SessionStart: ✅
+     SessionEnd: ✅
+
+🧠 Chroma Storage Status:
+  ✅ Storage backend: Chroma MCP
+  📍 Data location: /Users/username/.claude-mem/chroma
+  🔍 Features: Vector search, semantic similarity, document storage
+
+📊 Summary:
+  ✅ Claude Memory System is installed (Global)
+
+💡 To test: Use /compact in Claude Code
+```
+
+## Customization Options
+
+### Environment-Based Configuration
+```bash
+# Disable auto-compression
+export DISABLE_AUTO_COMPRESSION=true
+
+# Custom project name
+export CLAUDE_MEM_PROJECT_NAME="custom-project"
+
+# Silent operation
+export CLAUDE_MEM_SILENT=true
+
+# Debug mode
+export CLAUDE_MEM_DEBUG=true
+```
+
+### Project-Specific Overrides
+```json
+// .claude/settings.json (project-level)
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/custom/path/pre-compact.js",
+            "env": {
+              "CUSTOM_PROJECT_CONFIG": "true"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Migration and Updates
+
+### Updating Integration
+```bash
+# Update to latest version
+npm install -g claude-mem
+
+# Reinstall hooks
+claude-mem install --force
+
+# Verify update
+claude-mem status
+```
+
+### Version Compatibility
+- **Claude Code**: v1.0.0+ (hooks support required)
+- **Node.js**: v18.0.0+ (required for MCP integration)
+- **Platform**: macOS, Linux, Windows (WSL)
+
+## Troubleshooting Integration
+
+### Common Issues
+
+<Tabs>
+  <Tab title="Hooks Not Executing">
+    ```bash
+    # Check hook file permissions
+    chmod +x ~/.claude-mem/hooks/*.js
+
+    # Verify settings registration
+    claude-mem status
+
+    # Test hook manually
+    echo '{"session_id":"test","transcript_path":"/tmp/test","hook_event_name":"SessionStart"}' | node ~/.claude-mem/hooks/session-start.js
+    ```
+  </Tab>
+  <Tab title="Context Not Loading">
+    ```bash
+    # Check memory database
+    claude-mem load-context --project $(basename $PWD)
+
+    # Verify project name detection
+    echo "Current project: $(basename $PWD)"
+
+    # Enable debug logging
+    export CLAUDE_MEM_DEBUG=true
+    ```
+  </Tab>
+  <Tab title="Performance Issues">
+    ```bash
+    # Check hook timeouts
+    cat ~/.claude/settings.json | jq '.hooks.*.*.hooks[].timeout'
+
+    # Monitor execution time
+    time echo '{}' | ~/.claude-mem/hooks/session-start.js
+
+    # Reduce context loading
+    export CLAUDE_MEM_CONTEXT_LIMIT=5
+    ```
+  </Tab>
+</Tabs>
+
+### Reset Integration
+```bash
+# Complete reset
+claude-mem uninstall --all
+claude-mem install --force
+
+# Selective reset
+claude-mem uninstall --user
+claude-mem install --user --force
+```
+
+## Security Considerations
+
+### File Permissions
+```bash
+# Secure hook files
+chmod 700 ~/.claude-mem/hooks/
+chmod 600 ~/.claude-mem/hooks/*.js
+
+# Secure settings
+chmod 600 ~/.claude/settings.json
+```
+
+### Path Security
+- Always use absolute paths in hook configuration
+- Validate file paths in custom hooks
+- Avoid executing user-provided commands
+
+### Data Privacy
+- Memory data stored locally by default
+- No data transmitted to external services
+- Transcript compression preserves privacy
+
+## Related Documentation
+
+- [Settings Configuration](/configuration/settings) - Main configuration options
+- [Hook Configuration](/configuration/hooks) - Detailed hook customization
+- [CLI Reference](/cli/install) - Installation and management commands
+- [Troubleshooting Guide](/guides/troubleshooting) - Common issues and solutions
