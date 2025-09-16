@@ -1,151 +1,84 @@
 ---
-title: "Getting Started with Claude Memory"
-description: "Step-by-step guide to install, configure, and start using claude-mem for persistent context across Claude Code sessions"
+title: "Getting Started Guide"
+description: "Learn how claude-mem transforms your Claude Code workflow"
 ---
 
-# Getting Started with Claude Memory
+# Getting Started Guide
 
-Transform your Claude Code experience from starting fresh every time to picking up exactly where you left off. This guide will have you up and running with persistent memory in under 5 minutes.
+## Installation First
 
-## What You'll Get
+<Card title="🚀 Haven't installed yet?" icon="download" href="/quickstart">
+  Start with our one-command Quick Start guide
+</Card>
+
+Already installed? This guide shows you how to make the most of claude-mem.
+
+## Understanding What You've Got
+
+When you installed claude-mem, you gained:
 
 <CardGrid>
-  <Card title="Persistent Context" icon="brain">
-    Claude remembers your project details, coding patterns, and decisions across sessions
+  <Card title="Instant Memory" icon="brain">
+    Every conversation is automatically remembered and searchable
   </Card>
-  <Card title="Smart Recovery" icon="shield">
-    Safe deletion with automatic trash management and one-command restore
+  <Card title="Smart Context" icon="sparkles">
+    Relevant memories load automatically when you start coding
   </Card>
-  <Card title="Zero Configuration" icon="rocket">
-    Works out of the box with intelligent defaults
+  <Card title="Zero Effort" icon="wand-magic-sparkles">
+    No commands needed - everything happens automatically
   </Card>
-  <Card title="Background Operation" icon="eye-slash">
-    Seamlessly integrates without interrupting your workflow
+  <Card title="Safe Deletion" icon="shield">
+    Smart Trash™ keeps everything recoverable
   </Card>
 </CardGrid>
 
-## Prerequisites
-
-Before you begin, ensure you have:
-
-- **Node.js 18+** installed on your system
-- **Claude Code** CLI installed and working
-- Basic familiarity with command line operations
+## Your First Session
 
 <Steps>
-  <Step title="Install claude-mem">
-    Install the global package using npm:
+  <Step title="Start Claude Code">
+    Open any project. You'll see claude-mem load automatically:
 
-    ```bash
-    npm install -g claude-mem
     ```
-
-    <Note>
-      **Using Bun?** The package also works with Bun, but npm is recommended for global installations to ensure proper CLI registration.
-    </Note>
+    🧠 Claude Memory System - Active
+    📚 Loading relevant memories...
+    ✨ Ready. Start coding.
+    ```
   </Step>
 
-  <Step title="Set Up Integration">
-    Install the Claude Code hooks with a single command:
-
-    ```bash
-    claude-mem install
-    ```
-
-    This command:
-    - Sets up session hooks in your Claude Code configuration
-    - Creates the memory directory structure at `~/.claude-mem/`
-    - Configures the Chroma vector database for semantic search
-    - Tests the integration to ensure everything works
-
-    <Warning>
-      You'll see confirmation messages for each step. If any step fails, the installer will provide specific troubleshooting guidance.
-    </Warning>
+  <Step title="Work Normally">
+    Code as you always do. claude-mem captures everything in the background. No manual commands needed.
   </Step>
 
-  <Step title="Restart Claude Code">
-    For the memory system to activate, restart Claude Code completely:
+  <Step title="Save a Memory">
+    When you want to save the conversation, type:
 
-    ```bash
-    # Close all Claude Code sessions and restart
-    # On macOS, you can also quit and reopen the application
+    ```
+    /compact
     ```
 
-    The next time you start Claude Code, you'll see a brief memory loading message.
+    Or just use `/clear` - it saves automatically before clearing.
   </Step>
 
-  <Step title="Verify Installation">
-    Check that everything is working correctly:
-
-    ```bash
-    claude-mem status
-    ```
-
-    You should see output similar to:
+  <Step title="See It Work">
+    Start a new session. Your memories load instantly:
 
     ```
-    ✅ Claude Memory System Status
-
-    📦 Installation: Installed (User Level)
-    🔗 Integration: Active
-    🧠 Memory Index: Ready (0 memories)
-    🗑️  Smart Trash: Empty
-    📁 Storage: ~/.claude-mem/
+    🧠 Previous context loaded
+    📚 Found relevant memories from earlier sessions
     ```
   </Step>
 </Steps>
 
-## Your First Memory Session
+## How Memories Build Up
 
-Now let's create your first persistent memory:
+Each session adds to Claude's understanding:
 
-<Steps>
-  <Step title="Start a Claude Code Session">
-    Open Claude Code in any project directory:
+**Session 1:** "I'm building a React app with TypeScript"
+**Session 2:** Claude remembers React + TypeScript
+**Session 3:** "Add authentication" → Claude knows: React + TS + auth needs
+**Session 4:** Claude suggests JWT because that's what you used before
 
-    ```bash
-    cd your-project
-    claude-code
-    ```
-
-    You'll see a brief memory loading message at startup.
-  </Step>
-
-  <Step title="Have a Meaningful Conversation">
-    Discuss your project with Claude. For example:
-
-    - Explain your project structure and goals
-    - Discuss coding patterns you prefer
-    - Work through a specific problem or feature
-    - Review code architecture decisions
-
-    The more context you provide, the better Claude can remember for future sessions.
-  </Step>
-
-  <Step title="End the Session">
-    When you're done, simply exit Claude Code normally. The session will be automatically compressed into memory.
-  </Step>
-
-  <Step title="Check Your Memory">
-    View what was remembered:
-
-    ```bash
-    claude-mem load-context
-    ```
-
-    You'll see a summary of the compressed insights from your session.
-  </Step>
-
-  <Step title="Start a New Session">
-    Open Claude Code again in the same or different project:
-
-    ```bash
-    claude-code
-    ```
-
-    Notice how Claude now has context about your previous conversation and can reference earlier discussions.
-  </Step>
-</Steps>
+This happens automatically. No commands. No configuration.
 
 ## Understanding Memory Behavior
 

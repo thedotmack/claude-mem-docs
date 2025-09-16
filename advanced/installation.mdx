@@ -1,0 +1,527 @@
+---
+title: 'Advanced Installation'
+description: 'Platform-specific setup, building from source, and complex scenarios'
+---
+
+import { Steps } from '/snippets/steps.mdx'
+import { Tabs, Tab } from '/snippets/tabs.mdx'
+
+# Advanced Installation
+
+For when the [simple installation](/installation) doesn't cover your needs.
+
+## System Requirements
+
+### Minimum Requirements
+- Node.js 18.0.0 or higher
+- Claude Code desktop application
+- 100MB free disk space
+- Read/write access to home directory
+
+### Recommended Setup
+- Bun runtime (3x faster than npm)
+- macOS or Linux (better hook support)
+- Git for version control
+- SSD for optimal performance
+
+## Platform-Specific Installation
+
+<Tabs>
+  <Tab title="macOS">
+    ### Standard Installation
+    ```bash
+    npm install -g claude-mem && claude-mem install
+    ```
+
+    ### With Homebrew (if Node via Homebrew)
+    ```bash
+    brew install node  # if needed
+    npm install -g claude-mem
+    claude-mem install
+    ```
+
+    ### Permission Issues
+    If you get EACCES errors:
+    ```bash
+    sudo npm install -g claude-mem --unsafe-perm
+    claude-mem install
+    ```
+
+    ### Apple Silicon (M1/M2/M3)
+    Native ARM64 support included. No Rosetta needed.
+  </Tab>
+
+  <Tab title="Linux">
+    ### Ubuntu/Debian
+    ```bash
+    # Install Node.js if needed
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    sudo apt-get install -y nodejs
+
+    # Install claude-mem
+    sudo npm install -g claude-mem
+    claude-mem install
+    ```
+
+    ### Fedora/RHEL
+    ```bash
+    # Install Node.js if needed
+    sudo dnf install nodejs
+
+    # Install claude-mem
+    sudo npm install -g claude-mem
+    claude-mem install
+    ```
+
+    ### Arch Linux
+    ```bash
+    # Install Node.js if needed
+    sudo pacman -S nodejs npm
+
+    # Install claude-mem
+    sudo npm install -g claude-mem
+    claude-mem install
+    ```
+
+    ### WSL (Windows Subsystem for Linux)
+    ```bash
+    # Works like standard Linux
+    npm install -g claude-mem
+    claude-mem install
+    ```
+
+    <Warning>
+      WSL users: Ensure Claude Code can access WSL filesystem
+    </Warning>
+  </Tab>
+
+  <Tab title="Windows">
+    ### PowerShell (Administrator)
+    ```powershell
+    # Run PowerShell as Administrator
+    npm install -g claude-mem
+    claude-mem install
+    ```
+
+    ### Command Prompt (Administrator)
+    ```cmd
+    npm install -g claude-mem
+    claude-mem install
+    ```
+
+    ### Common Windows Issues
+
+    **Long Path Support**
+    ```powershell
+    # Enable long paths (requires restart)
+    New-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\FileSystem" `
+      -Name "LongPathsEnabled" -Value 1 -PropertyType DWORD -Force
+    ```
+
+    **Execution Policy**
+    ```powershell
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+
+    <Warning>
+      Windows hook support is limited. Core features work, but some automatic triggers may not fire.
+    </Warning>
+  </Tab>
+</Tabs>
+
+## Building From Source
+
+<Steps>
+
+### Clone the repository
+```bash
+git clone https://github.com/thedotmack/claude-mem.git
+cd claude-mem
+```
+
+### Install dependencies
+<Tabs>
+  <Tab title="bun (recommended)">
+    ```bash
+    bun install
+    ```
+  </Tab>
+  <Tab title="npm">
+    ```bash
+    npm install
+    ```
+  </Tab>
+</Tabs>
+
+### Build the project
+```bash
+bun run build
+# or: npm run build
+```
+
+### Link globally
+```bash
+bun link
+# or: npm link
+```
+
+### Install integration
+```bash
+claude-mem install
+```
+
+</Steps>
+
+## Custom Installation Options
+
+### Custom Directory
+
+Install to a non-default location:
+
+```bash
+claude-mem install --dir ~/my-custom-path
+```
+
+Then set environment variable:
+```bash
+export CLAUDE_MEM_HOME=~/my-custom-path
+```
+
+### Save on Clear
+
+Enable automatic memory compression on `/clear`:
+
+```bash
+claude-mem install --save-on-clear
+```
+
+### Force Reinstall
+
+Overwrite existing installation:
+
+```bash
+claude-mem install --force
+```
+
+### Verbose Output
+
+Debug installation process:
+
+```bash
+claude-mem install --verbose
+```
+
+## Docker Installation
+
+For containerized environments:
+
+```dockerfile
+FROM node:18-alpine
+RUN npm install -g claude-mem
+RUN claude-mem install --dir /data/claude-mem
+ENV CLAUDE_MEM_HOME=/data/claude-mem
+```
+
+## Enterprise Installation
+
+### Behind Corporate Proxy
+
+```bash
+# Set proxy
+export HTTP_PROXY=http://proxy.company.com:8080
+export HTTPS_PROXY=http://proxy.company.com:8080
+
+# Install with proxy
+npm install -g claude-mem --proxy http://proxy.company.com:8080
+claude-mem install
+```
+
+### Custom NPM Registry
+
+```bash
+npm config set registry https://registry.company.com/
+npm install -g claude-mem
+claude-mem install
+```
+
+### Shared Installation
+
+For multi-user systems:
+
+```bash
+# Install as root
+sudo npm install -g claude-mem
+
+# Each user runs
+claude-mem install --user
+```
+
+## File Structure Details
+
+Complete installation creates:
+
+```
+~/.claude-mem/
+├── index/                  # Chroma vector database
+│   ├── chroma.sqlite3     # Main database
+│   └── collections/       # Memory collections
+├── archives/              # Compressed conversations
+│   └── YYYY-MM-DD/       # Date-organized
+├── hooks/                 # Claude Code integration
+│   ├── pre-compact.js    # Before /compact command
+│   ├── session-start.js  # On session start
+│   └── session-end.js    # On session end
+├── trash/                 # Smart Trash™ system
+│   ├── memories/         # Deleted memories
+│   └── metadata.json     # Recovery metadata
+├── logs/                  # System logs
+│   ├── install.log       # Installation log
+│   ├── hooks.log         # Hook execution log
+│   └── errors.log        # Error tracking
+├── settings.json         # User configuration
+└── mcp-config.json      # MCP server config
+```
+
+## MCP Server Configuration
+
+### Manual MCP Setup
+
+If automatic setup fails, add to Claude Code settings:
+
+```json
+{
+  "mcpServers": {
+    "chromadb-claude-mem": {
+      "command": "npx",
+      "args": [
+        "@modelcontextprotocol/server-chromadb",
+        "--collections",
+        "claude_memories"
+      ],
+      "env": {
+        "CHROMA_PATH": "~/.claude-mem/index"
+      }
+    }
+  }
+}
+```
+
+### Alternative MCP Configuration
+
+Using local installation:
+
+```json
+{
+  "mcpServers": {
+    "chromadb-claude-mem": {
+      "command": "node",
+      "args": [
+        "~/.claude-mem/node_modules/@modelcontextprotocol/server-chromadb/dist/index.js"
+      ]
+    }
+  }
+}
+```
+
+## Hook Customization
+
+### Custom Hook Directory
+
+```bash
+claude-mem install --hooks-dir ~/my-hooks
+```
+
+### Disable Specific Hooks
+
+```bash
+claude-mem install --skip-hooks session-end
+```
+
+### Custom Hook Scripts
+
+Create `~/.claude-mem/hooks/custom.js`:
+
+```javascript
+module.exports = async (context) => {
+  // Your custom logic
+  console.log('Custom hook triggered!');
+};
+```
+
+## Troubleshooting
+
+### Installation Failures
+
+<AccordionGroup>
+  <Accordion title="EACCES: permission denied">
+    ```bash
+    # macOS/Linux
+    sudo npm install -g claude-mem --unsafe-perm
+
+    # Or use a Node version manager
+    nvm use 18
+    npm install -g claude-mem
+    ```
+  </Accordion>
+
+  <Accordion title="Command not found after install">
+    ```bash
+    # Add npm global bin to PATH
+    export PATH="$PATH:$(npm bin -g)"
+
+    # Make permanent (bash)
+    echo 'export PATH="$PATH:$(npm bin -g)"' >> ~/.bashrc
+
+    # Make permanent (zsh)
+    echo 'export PATH="$PATH:$(npm bin -g)"' >> ~/.zshrc
+    ```
+  </Accordion>
+
+  <Accordion title="Hooks not triggering">
+    1. Check Claude Code version (must be recent)
+    2. Verify hook files exist:
+       ```bash
+       ls -la ~/.claude-mem/hooks/
+       ```
+    3. Check hook permissions:
+       ```bash
+       chmod +x ~/.claude-mem/hooks/*.js
+       ```
+    4. Review logs:
+       ```bash
+       claude-mem logs --hooks
+       ```
+  </Accordion>
+
+  <Accordion title="MCP server connection failed">
+    ```bash
+    # Test MCP server directly
+    npx @modelcontextprotocol/server-chromadb
+
+    # Check if port is in use
+    lsof -i :8000
+
+    # Restart Claude Code completely
+    killall "Claude Code" && open -a "Claude Code"
+    ```
+  </Accordion>
+
+  <Accordion title="Database corruption">
+    ```bash
+    # Backup existing data
+    cp -r ~/.claude-mem ~/.claude-mem.backup
+
+    # Reset database
+    claude-mem reset --database
+
+    # Restore from backup if needed
+    claude-mem restore --from ~/.claude-mem.backup
+    ```
+  </Accordion>
+</AccordionGroup>
+
+### Performance Issues
+
+<AccordionGroup>
+  <Accordion title="Slow memory loading">
+    ```bash
+    # Optimize database
+    claude-mem optimize
+
+    # Limit memory search results
+    claude-mem config set maxMemories 10
+    ```
+  </Accordion>
+
+  <Accordion title="High disk usage">
+    ```bash
+    # Clean old archives
+    claude-mem clean --older-than 30d
+
+    # Compress archives
+    claude-mem compress --archives
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Migration & Backup
+
+### Backup Your Memories
+
+```bash
+# Full backup
+tar -czf claude-mem-backup.tar.gz ~/.claude-mem
+
+# Selective backup
+claude-mem export --output memories-backup.json
+```
+
+### Restore From Backup
+
+```bash
+# Full restore
+tar -xzf claude-mem-backup.tar.gz -C ~/
+
+# Selective restore
+claude-mem import --input memories-backup.json
+```
+
+### Migrate Between Machines
+
+```bash
+# On old machine
+claude-mem export --full --output claude-mem-export.zip
+
+# On new machine
+claude-mem import --full --input claude-mem-export.zip
+```
+
+## Environment Variables
+
+```bash
+# Custom home directory
+export CLAUDE_MEM_HOME=~/custom/path
+
+# Debug mode
+export CLAUDE_MEM_DEBUG=true
+
+# Disable telemetry (already off by default)
+export CLAUDE_MEM_NO_TELEMETRY=true
+
+# Custom log level
+export CLAUDE_MEM_LOG_LEVEL=debug
+
+# Memory search limit
+export CLAUDE_MEM_MAX_RESULTS=20
+```
+
+## Uninstalling Completely
+
+```bash
+# Remove hooks and configuration
+claude-mem uninstall
+
+# Remove package
+npm uninstall -g claude-mem
+
+# Remove all data (WARNING: deletes all memories)
+rm -rf ~/.claude-mem
+
+# Remove from Claude Code settings
+# Manually remove MCP server config from Claude Code settings.json
+```
+
+## Getting Help
+
+<CardGrid cols={2}>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/thedotmack/claude-mem/issues">
+    Report bugs or request features
+  </Card>
+  <Card title="Troubleshooting Guide" icon="wrench" href="/guides/troubleshooting">
+    Common issues and solutions
+  </Card>
+</CardGrid>
+
+---
+
+**Most users never need this page. The [simple installation](/installation) just works.** 🧠

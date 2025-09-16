@@ -1,118 +1,116 @@
 ---
 title: 'Introduction'
-description: 'Welcome to Claude Memory System - Your AI conversation memory that actually works'
+description: 'Claude remembers everything. Automatically. Zero config.'
 ---
 
 import { Card, CardGrid } from '/snippets/card-grid.mdx'
 
-# Claude Memory System (claude-mem)
+# Claude Memory System
 
-## Remember that one thing? Neither do we… but `claude-mem` does! 😵‍💫
-
-Stop repeating yourself. `claude-mem` remembers what you and Claude Code figure out, so every new chat starts smarter than the last.
-
-<CardGrid cols={2}>
-  <Card title="10-Second Setup" icon="rocket" href="/quickstart">
-    One command to install, automatic integration with Claude Code
-  </Card>
-  <Card title="Smart Context" icon="brain" href="/concepts/how-it-works">
-    Automatically loads relevant memories when you start coding
-  </Card>
-  <Card title="Zero Config" icon="settings" href="/installation">
-    Works out of the box with sensible defaults
-  </Card>
-  <Card title="Smart Trash™" icon="trash" href="/concepts/smart-trash">
-    Never lose anything - deleted items are recoverable
-  </Card>
-</CardGrid>
-
-## Why claude-mem?
-
-Every time you start a new Claude Code session, you're starting from scratch. You have to re-explain your project structure, remind Claude about that bug you fixed yesterday, and repeat the same context over and over.
-
-**claude-mem changes that.**
-
-### 🧠 What it does
-
-- **Remembers key insights** from your coding sessions
-- **Compresses conversations** into searchable memories
-- **Loads relevant context** automatically when you start
-- **Works silently** in the background via hooks
-
-### ✨ Key Features
-
-<CardGrid cols={3}>
-  <Card title="Automatic" icon="wand-magic-sparkles">
-    Hooks into Claude Code lifecycle - no manual commands needed
-  </Card>
-  <Card title="Intelligent" icon="lightbulb">
-    Uses semantic search to find relevant memories
-  </Card>
-  <Card title="Fast" icon="bolt">
-    Minified runtime, efficient compression
-  </Card>
-  <Card title="Safe" icon="shield">
-    Smart Trash™ keeps deleted items recoverable
-  </Card>
-  <Card title="Simple" icon="circle-check">
-    One command install, minimal dependencies
-  </Card>
-  <Card title="Open" icon="code">
-    AGPL-3.0 licensed, fully open source
-  </Card>
-</CardGrid>
-
-## How it works
-
-1. **Install once** - `npm install -g claude-mem && claude-mem install`
-2. **Code normally** - claude-mem watches your Claude Code sessions
-3. **Automatic compression** - When you finish, memories are saved
-4. **Smart loading** - Next session starts with relevant context
-
-No configuration needed. No manual commands. It just works.
-
-## Quick Example
+## One command. Then Claude just remembers. That's it.
 
 ```bash
-# Install globally
-npm install -g claude-mem
-
-# Set up the integration
-claude-mem install
-
-# That's it! Restart Claude Code and you're ready
+npm install -g claude-mem && claude-mem install
 ```
 
-When you start your next session, you'll see:
+**Done.** Claude now remembers every insight, fix, and decision from your previous sessions. No configuration. No manual commands. It just works.
 
-```
-📚 Memories
-────────────────────────────────
-🔍 Found 3 relevant memories from previous sessions
-
-1. Fixed authentication bug in login component
-2. Implemented dark mode with Tailwind CSS
-3. Optimized database queries for user dashboard
-────────────────────────────────
-```
-
-## Ready to get started?
+## ⚡ Instant Features (All Automatic)
 
 <CardGrid cols={2}>
-  <Card title="Quick Start" icon="play" href="/quickstart">
-    Get up and running in 60 seconds
+  <Card title="Instant Context" icon="zap" href="/instant-features">
+    Start coding. Previous context loads automatically. Zero commands.
   </Card>
-  <Card title="Installation Guide" icon="download" href="/installation">
-    Detailed installation instructions
+  <Card title="Instant Memory" icon="brain" href="/instant-features#instant-memory">
+    Type /clear or /compact. Memories compress and save. That's it.
+  </Card>
+  <Card title="Instant Recovery" icon="rotate-left" href="/instant-features#smart-trash">
+    Deleted something? It's in Smart Trash™. One command restores it.
+  </Card>
+  <Card title="Instant Search" icon="magnifying-glass" href="/instant-features#semantic-search">
+    Semantic search finds relevant memories. No keywords needed.
   </Card>
 </CardGrid>
 
-## Community & Support
+## See It In Action
 
-- [GitHub Issues](https://github.com/thedotmack/claude-mem/issues) - Report bugs or request features
-- [NPM Package](https://www.npmjs.com/package/claude-mem) - View package details
-- [Contributing](/advanced/contributing) - Help make claude-mem better
+Start a new Claude Code session and see:
+
+```
+🧠 Claude Memory System - Active
+────────────────────────────────
+📚 Found 5 relevant memories:
+
+• Fixed authentication bug with JWT tokens
+• Database schema uses PostgreSQL with Prisma
+• Dark mode implementation uses Tailwind CSS
+• API rate limiting set to 100 requests/minute
+• Prefer tabs over spaces (4 spaces width)
+────────────────────────────────
+Context loaded. Start coding.
+```
+
+**That's it.** No commands. No configuration. Just instant context.
+
+## Why It's Different
+
+<CardGrid cols={3}>
+  <Card title="Zero Config" icon="check">
+    Install. Restart Claude. Done.
+  </Card>
+  <Card title="Zero Commands" icon="wand-magic-sparkles">
+    Everything automatic via hooks
+  </Card>
+  <Card title="Zero Loss" icon="shield">
+    Smart Trash™ keeps everything
+  </Card>
+  <Card title="Zero Latency" icon="bolt">
+    Minified, optimized, instant
+  </Card>
+  <Card title="Zero Learning" icon="baby">
+    Works exactly as expected
+  </Card>
+  <Card title="Zero Lock-in" icon="unlock">
+    Open source, your data
+  </Card>
+</CardGrid>
+
+## The Problem It Solves
+
+Without claude-mem:
+- 😤 "Remember that bug we fixed yesterday?"
+- 😤 "What was that API endpoint again?"
+- 😤 "Did we decide on tabs or spaces?"
+- 😤 Starting fresh every. single. time.
+
+With claude-mem:
+- ✨ Claude knows your bug fixes
+- ✨ Claude knows your API structure
+- ✨ Claude knows your preferences
+- ✨ Every session builds on the last
+
+## Install Now
+
+<CardGrid cols={2}>
+  <Card title="⚡ Quick Install" icon="rocket" href="/quickstart">
+    One command. 10 seconds. Done.
+  </Card>
+  <Card title="🎯 See Instant Features" icon="sparkles" href="/instant-features">
+    Everything that happens automatically
+  </Card>
+</CardGrid>
+
+## Advanced Users
+
+Need more control? Check out the [Advanced Section](/advanced/installation) for:
+- Platform-specific setup
+- Build from source
+- Custom configurations
+- Hook customization
+- MCP server details
+
+But honestly? You probably don't need any of that. It just works.
 
 ---
 
-*Your future self will thank you. 🧠✨*
+**Install now. Thank yourself later.** 🧠

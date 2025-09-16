@@ -1,162 +1,90 @@
 ---
 title: 'Quick Start'
-description: 'Get claude-mem up and running in 60 seconds'
+description: 'One command. Ten seconds. Done.'
 ---
 
-import { Steps } from '/snippets/steps.mdx'
 import { Tabs, Tab } from '/snippets/tabs.mdx'
 
-Get claude-mem installed and working with Claude Code in less than a minute.
+# Quick Start
 
-## Prerequisites
-
-<Card title="Requirements" icon="check">
-  - Node.js 18+ installed
-  - Claude Code desktop app
-  - npm or bun package manager
-</Card>
-
-## Installation
-
-<Steps>
-
-### Install claude-mem globally
+## Install (10 seconds)
 
 <Tabs>
-  <Tab title="npm">
+  <Tab title="npm (recommended)">
     ```bash
-    npm install -g claude-mem
+    npm install -g claude-mem && claude-mem install
     ```
   </Tab>
-  <Tab title="bun">
+  <Tab title="bun (faster)">
     ```bash
-    bun install -g claude-mem
+    bun install -g claude-mem && claude-mem install
     ```
   </Tab>
 </Tabs>
 
-### Run the installer
+## Restart Claude Code
+
+Close and reopen Claude Code.
+
+## Done! 🎉
+
+Claude now remembers everything. Start coding and watch your context load automatically.
+
+---
+
+## That's literally it.
+
+No configuration. No setup. No learning curve. It just works.
+
+When you start Claude Code, you'll see:
+
+```
+🧠 Claude Memory System - Active
+────────────────────────────────
+📚 Loading relevant memories...
+✨ Context ready. Start coding.
+```
+
+## What Just Happened?
+
+- ✅ Hooks installed (captures your sessions)
+- ✅ MCP server configured (manages memories)
+- ✅ Smart Trash™ enabled (never lose anything)
+- ✅ Semantic search ready (finds relevant context)
+- ✅ Auto-compression active (saves on /clear or /compact)
+
+All automatic. All instant.
+
+## Try It Now
+
+1. Ask Claude something: "Remember I prefer TypeScript strict mode"
+2. Type `/compact`
+3. Start a new session
+4. Watch your preference appear automatically
+
+## Need Help?
 
 ```bash
-claude-mem install
+claude-mem status    # Check everything's working
+claude-mem logs      # See what's happening
+claude-mem --help    # All commands
 ```
 
-This command will:
-- Set up Claude Code hooks
-- Configure MCP server integration
-- Add instructions to your CLAUDE.md
-- Create necessary directories
+<Card title="Something Wrong?" icon="wrench" href="/guides/troubleshooting">
+  99% of issues are fixed with: `claude-mem install --force`
+</Card>
 
-### Restart Claude Code
-
-Close and reopen Claude Code to activate the integration.
-
-### Verify installation
-
-```bash
-claude-mem status
-```
-
-You should see:
-```
-✅ Installation Status: Complete
-✅ Hooks: Installed
-✅ MCP Server: Configured
-✅ Settings: Found
-```
-
-</Steps>
-
-## Your First Memory
-
-Once installed, claude-mem works automatically:
-
-1. **Start coding** - Open any project in Claude Code
-2. **Work normally** - claude-mem captures your conversation
-3. **Save memories** - Type `/compact` or `/clear` to compress
-4. **Automatic loading** - Next session loads relevant context
-
-<Note>
-  Memories are compressed when you use `/compact` or `/clear` commands in Claude Code, or when the session ends.
-</Note>
-
-## What Happens Behind the Scenes
-
-When you start a new Claude Code session:
-
-```mermaid
-graph LR
-    A[Session Start] --> B[claude-mem loads]
-    B --> C[Searches memories]
-    C --> D[Displays context]
-    D --> E[You start coding]
-```
-
-When you end a session:
-
-```mermaid
-graph LR
-    A[Session End] --> B[Compression triggers]
-    B --> C[Extracts insights]
-    C --> D[Stores in Chroma]
-    D --> E[Ready for next time]
-```
-
-## Test It Out
-
-Try this simple test:
-
-1. Open a project in Claude Code
-2. Ask Claude: "Remember that I prefer tabs over spaces"
-3. Type `/compact` to save the memory
-4. Start a new session
-5. You'll see your preference loaded automatically!
-
-## Common Commands
+## Want More?
 
 <CardGrid cols={2}>
-  <Card title="claude-mem status" icon="heart-pulse">
-    Check if everything is working
+  <Card title="🎯 Instant Features" icon="sparkles" href="/instant-features">
+    See everything that's automatic
   </Card>
-  <Card title="claude-mem load-context" icon="download">
-    Preview what memories are available
-  </Card>
-  <Card title="claude-mem logs" icon="scroll">
-    View recent activity logs
-  </Card>
-  <Card title="claude-mem install --force" icon="wrench">
-    Reinstall/fix any issues
+  <Card title="🔧 Advanced Setup" icon="cog" href="/advanced/installation">
+    Platform-specific, source builds, customization
   </Card>
 </CardGrid>
 
-## Next Steps
+---
 
-<CardGrid cols={3}>
-  <Card title="How It Works" icon="cog" href="/concepts/how-it-works">
-    Understand the architecture
-  </Card>
-  <Card title="Configuration" icon="sliders" href="/configuration/settings">
-    Customize your setup
-  </Card>
-  <Card title="CLI Reference" icon="terminal" href="/cli/overview">
-    Explore all commands
-  </Card>
-</CardGrid>
-
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="Installation failed">
-    Run `claude-mem install --force` to reinstall
-  </Accordion>
-  <Accordion title="Memories not loading">
-    Check `claude-mem status` and ensure MCP server is running
-  </Accordion>
-  <Accordion title="Command not found">
-    Ensure claude-mem is in your PATH: `npm list -g claude-mem`
-  </Accordion>
-</AccordionGroup>
-
-<Tip>
-  If you encounter any issues, check our [troubleshooting guide](/guides/troubleshooting) or [open an issue](https://github.com/thedotmack/claude-mem/issues).
-</Tip>
+**Stop reading. Start coding. Claude remembers now.** 🧠

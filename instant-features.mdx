@@ -1,0 +1,215 @@
+---
+title: 'Instant Features'
+description: 'Everything that happens automatically. Zero commands. Zero config.'
+---
+
+import { Card, CardGrid } from '/snippets/card-grid.mdx'
+
+# Instant Features
+
+Everything below happens **automatically**. No commands. No configuration. Just install and it works.
+
+## ⚡ Instant Context Loading
+
+**What happens:** Start Claude Code. Your memories load instantly.
+
+```
+🧠 Claude Memory System
+────────────────────────────────
+📚 Found 8 relevant memories:
+
+• Authentication: JWT with refresh tokens
+• Database: PostgreSQL + Prisma ORM
+• Frontend: React 18 with TypeScript
+• State: Zustand for global state
+• Styling: Tailwind CSS + shadcn/ui
+• Testing: Vitest + React Testing Library
+• API: RESTful with rate limiting
+• Preferences: Tabs (4 spaces), strict mode
+────────────────────────────────
+```
+
+**How it works:** Semantic search finds relevant memories based on your project. No keywords needed.
+
+## 🧠 Instant Memory Compression
+
+**What happens:** Type `/compact` or `/clear`. Memories save automatically.
+
+**Before:**
+```
+You: How should we handle auth?
+Claude: Let's use JWT tokens with...
+[100 messages later]
+You: /compact
+```
+
+**After:**
+```
+✨ Compressed to memory:
+"Project uses JWT authentication with refresh tokens,
+15-minute access token expiry, httpOnly cookies for
+security, and Redis for token blacklisting."
+```
+
+**Zero effort.** Just use Claude normally. Compression happens automatically.
+
+## 🗑️ Instant Recovery (Smart Trash™)
+
+**What happens:** Delete something by accident? It's still there.
+
+```bash
+# Oops, deleted important memories
+$ claude-mem restore
+
+🗑️ Smart Trash™ Recovery
+────────────────────────────────
+Found 31 deleted items:
+
+1. auth-implementation (2 hours ago)
+2. database-schema (3 hours ago)
+3. api-endpoints (yesterday)
+
+Select items to restore: 1,2,3
+✅ Restored 3 items
+```
+
+**Never lose anything.** Smart Trash™ keeps everything recoverable.
+
+## 🔍 Instant Semantic Search
+
+**What happens:** Memories are found by meaning, not keywords.
+
+Ask about "user login" and it finds:
+- Authentication flow
+- JWT implementation
+- Password hashing
+- Session management
+- Security policies
+
+**No exact matches needed.** Semantic search understands context.
+
+## 🔄 Instant Session Continuity
+
+**What happens:** Every session builds on the last.
+
+**Session 1:**
+```
+You: Let's use PostgreSQL with Prisma
+Claude: Great choice! I'll set up...
+```
+
+**Session 2 (next day):**
+```
+Claude: I see we're using PostgreSQL with Prisma.
+        Let me continue with the schema...
+```
+
+**No repetition.** Claude remembers your decisions.
+
+## 📊 Instant Status Check
+
+**What happens:** One command shows everything.
+
+```bash
+$ claude-mem status
+
+🧠 Claude Memory System
+────────────────────────────────
+✅ Status: Active
+✅ Memories: 142 stored
+✅ Last sync: 2 minutes ago
+✅ Hooks: All working
+✅ MCP: Connected
+✅ Trash: 31 items (4.6 MB)
+```
+
+**Complete visibility.** Know exactly what's happening.
+
+## 🎣 Instant Hook Integration
+
+**What happens:** Claude Code hooks capture everything automatically.
+
+- **session-start:** Loads memories
+- **session-end:** Saves conversation
+- **pre-compact:** Compresses on command
+- **pre-clear:** Saves before clearing
+
+**No manual triggers.** Hooks work silently in the background.
+
+## 🚀 Instant Performance
+
+**What happens:** Everything is optimized for speed.
+
+- **Minified runtime:** Smallest possible footprint
+- **Lazy loading:** Only loads what's needed
+- **Local storage:** No network latency
+- **Incremental updates:** Only processes changes
+
+**Zero lag.** Designed to be invisible.
+
+## 🔐 Instant Privacy
+
+**What happens:** Your data stays yours.
+
+- **Local only:** Everything stored on your machine
+- **No telemetry:** Zero data collection
+- **Open source:** Audit the code yourself
+- **Your control:** Delete anything, anytime
+
+**Complete privacy.** No cloud. No tracking. Just local memory.
+
+## 🎯 Instant Project Detection
+
+**What happens:** Knows which project you're in.
+
+Open `/Users/you/my-app` and claude-mem:
+1. Detects the project name
+2. Loads project-specific memories
+3. Ignores unrelated context
+4. Maintains project isolation
+
+**Smart context.** Each project gets its own memory space.
+
+## 📝 Instant CLAUDE.md Integration
+
+**What happens:** Adds memory instructions to your CLAUDE.md automatically.
+
+```markdown
+<!-- Added by claude-mem -->
+Before saying "I don't have context" → SEARCH YOUR MEMORIES
+Use: mcp__claude-mem__search_memories(["search terms"])
+```
+
+**Claude knows to search.** No manual reminders needed.
+
+## 🔄 Instant Updates
+
+**What happens:** Stay current automatically.
+
+```bash
+$ npm update -g claude-mem
+$ claude-mem install --force
+```
+
+**Always improving.** Updates preserve your memories.
+
+---
+
+## The Magic Is No Magic
+
+Everything above happens with **zero configuration** and **zero commands** (except the initial install).
+
+This is what "it just works" actually means.
+
+<CardGrid cols={2}>
+  <Card title="Install Now" icon="rocket" href="/quickstart">
+    One command. Then all this is yours.
+  </Card>
+  <Card title="How It Works" icon="cog" href="/concepts/how-it-works">
+    The technical details (if you're curious)
+  </Card>
+</CardGrid>
+
+---
+
+**Stop configuring. Start remembering.** 🧠✨
