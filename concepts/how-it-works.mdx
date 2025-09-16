@@ -57,7 +57,7 @@ claude-mem integrates with Claude Code through three main hooks:
     Loads relevant memories when you begin coding
   </Card>
   <Card title="session-end" icon="stop">
-    Compresses and saves the conversation
+    (Optional) Saves before `/clear` when enabled
   </Card>
   <Card title="pre-compact" icon="compress">
     Handles manual compression via `/compact`
@@ -79,7 +79,7 @@ When a session ends or you trigger compression:
     **Generate Summaries** - Creates searchable memory documents
   </Step>
   <Step>
-    **Store in Chroma** - Saves with metadata for semantic search
+    **Save Memories** - Writes to the local JSONL index and instructs Claude to sync with Chroma via MCP tools
   </Step>
 </Steps>
 
@@ -88,13 +88,15 @@ When a session ends or you trigger compression:
 When you start a new session:
 
 1. **Project Detection** - Identifies current working directory
-2. **Semantic Search** - Queries Chroma for relevant memories
-3. **Ranking** - Sorts by relevance and recency
+2. **Memory Lookup** - Reads recent entries from the local JSONL index
+3. **Ranking** - Orders by recency and session grouping
 4. **Display** - Shows formatted context in session start
+
+The hook reads `~/.claude-mem/claude-mem-index.jsonl`, so you always see the most recent summaries even without running a Chroma query.
 
 ## Memory Storage
 
-claude-mem uses a document-based approach with Chroma DB:
+claude-mem writes each summary to a local JSONL index and asks Claude (via MCP) to persist the same document in Chroma:
 
 ```javascript
 {
@@ -116,9 +118,9 @@ claude-mem uses a document-based approach with Chroma DB:
 
 <FileTree>
   <Folder name="~/.claude-mem" defaultOpen>
-    <Folder name="index" defaultOpen>
-      <File name="chroma.sqlite3" />
-      <Comment>Chroma vector database</Comment>
+    <File name="claude-mem-index.jsonl" />
+    <Folder name="chroma" defaultOpen>
+      <Comment>Persistent data for the Chroma MCP server</Comment>
     </Folder>
     <Folder name="archives" defaultOpen>
       <File name="session_2025-09-15.json" />
@@ -127,6 +129,12 @@ claude-mem uses a document-based approach with Chroma DB:
     <Folder name="trash" defaultOpen>
       <File name="deleted_memory.json" />
       <Comment>Recoverable deletions</Comment>
+    </Folder>
+    <Folder name="hooks">
+      <Comment>Installed Claude Code hook scripts</Comment>
+    </Folder>
+    <Folder name="logs">
+      <Comment>Compression and hook logs</Comment>
     </Folder>
   </Folder>
 </FileTree>

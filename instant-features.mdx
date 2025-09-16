@@ -5,11 +5,11 @@ description: 'Everything that happens automatically. Zero commands. Zero config.
 
 import { Card, CardGrid } from '/snippets/card-grid.mdx'
 
-Everything below happens **automatically**. No commands. No configuration. Just install and it works.
+Everything below kicks in after a single install. Most workflows are automatic, and we call out the few optional switches so you know when something needs your input.
 
 ## ⚡ Instant Context Loading
 
-**What happens:** Start Claude Code. Your memories load instantly.
+**What happens:** Start Claude Code. Recent memories load instantly.
 
 ```
 🧠 Claude Memory System
@@ -27,11 +27,11 @@ Everything below happens **automatically**. No commands. No configuration. Just 
 ────────────────────────────────
 ```
 
-**How it works:** Semantic search finds relevant memories based on your project. No keywords needed.
+**How it works:** The session-start hook pulls the latest saved memories for the current project from the local index. Ask Claude to run a semantic search via the claude-mem MCP tools when you need something older or more specific.
 
 ## 🧠 Instant Memory Compression
 
-**What happens:** Type `/compact` or `/clear`. Memories save automatically.
+**What happens:** Type `/compact` and the conversation is saved immediately. During installation you can opt-in to also save when `/clear` runs.
 
 **Before:**
 ```
@@ -49,7 +49,7 @@ You: /compact
 security, and Redis for token blacklisting."
 ```
 
-**Zero effort.** Just use Claude normally. Compression happens automatically.
+**Zero effort.** `/compact` works out of the box, and `/clear` compression is available if you enabled it during install.
 
 ## 🗑️ Instant Recovery (Smart Trash™)
 
@@ -61,30 +61,30 @@ $ claude-mem restore
 
 🗑️ Smart Trash™ Recovery
 ────────────────────────────────
-Found 31 deleted items:
+Found 3 deleted items:
 
-1. auth-implementation (2 hours ago)
-2. database-schema (3 hours ago)
-3. api-endpoints (yesterday)
+❯ auth-implementation (2 hours ago)
+  database-schema (3 hours ago)
+  api-endpoints (yesterday)
 
-Select items to restore: 1,2,3
-✅ Restored 3 items
+Select file to restore:
+✅ Restored auth-implementation.1726096800
 ```
 
-**Never lose anything.** Smart Trash™ keeps everything recoverable.
+**Never lose anything.** Smart Trash™ keeps everything recoverable and restores one item at a time so you always know what changed.
 
-## 🔍 Instant Semantic Search
+## 🔍 Semantic Search on Demand
 
-**What happens:** Memories are found by meaning, not keywords.
+**What happens:** Ask Claude to run `mcp__claude-mem__chroma_query_documents` and it searches your memories by meaning.
 
-Ask about "user login" and it finds:
-- Authentication flow
-- JWT implementation
-- Password hashing
-- Session management
-- Security policies
+Typical natural-language prompts find:
+- Authentication flow details
+- JWT implementation fixes
+- Password hashing notes
+- Session management trade-offs
+- Security policies and checklists
 
-**No exact matches needed.** Semantic search understands context.
+**No exact matches needed.** Semantic search is available whenever you call the tool.
 
 ## 🔄 Instant Session Continuity
 
@@ -111,14 +111,37 @@ Claude: I see we're using PostgreSQL with Prisma.
 ```bash
 $ claude-mem status
 
-🧠 Claude Memory System
-────────────────────────────────
-✅ Status: Active
-✅ Memories: 142 stored
-✅ Last sync: 2 minutes ago
-✅ Hooks: All working
-✅ MCP: Connected
-✅ Trash: 31 items (4.6 MB)
+🔍 Claude Memory System Status Check
+=====================================
+
+📂 Installed Hook Scripts:
+  ✅ pre-compact.js: Found at ~/.claude-mem/hooks/pre-compact.js
+  ✅ session-start.js: Found at ~/.claude-mem/hooks/session-start.js
+  ✅ session-end.js: Found at ~/.claude-mem/hooks/session-end.js
+
+⚙️  Settings Configuration:
+  📋 Global: ~/.claude/settings.json
+     PreCompact: ✅
+     SessionStart: ✅
+     SessionEnd: ✅
+
+📦 Compressed Transcripts:
+  Compressed files: 15
+  Archive files: 3
+
+🔧 Runtime Environment:
+  ✅ Node.js: v20.10.0
+  ✅ Bun: 1.0.25
+
+🧠 Chroma Storage Status:
+  ✅ Storage backend: Chroma MCP
+  📍 Data location: ~/.claude-mem/chroma
+  🔍 Features: Vector search, semantic similarity, document storage
+
+📊 Summary:
+  ✅ Claude Memory System is installed (Global)
+
+💡 To test: Use /compact in Claude Code
 ```
 
 **Complete visibility.** Know exactly what's happening.
@@ -127,12 +150,11 @@ $ claude-mem status
 
 **What happens:** Claude Code hooks capture everything automatically.
 
-- **session-start:** Loads memories
-- **session-end:** Saves conversation
-- **pre-compact:** Compresses on command
-- **pre-clear:** Saves before clearing
+- **session-start:** Loads the latest project memories from the index
+- **pre-compact:** Compresses when you type `/compact`
+- **session-end:** Optionally saves just before `/clear` (if you enabled save-on-clear)
 
-**No manual triggers.** Hooks work silently in the background.
+**No manual triggers.** Once installed, the hooks run without any extra commands.
 
 ## 🚀 Instant Performance
 
@@ -173,9 +195,19 @@ Open `/Users/you/my-app` and claude-mem:
 **What happens:** Adds memory instructions to your CLAUDE.md automatically.
 
 ```markdown
-<!-- Added by claude-mem -->
-Before saying "I don't have context" → SEARCH YOUR MEMORIES
-Use: mcp__claude-mem__search_memories(["search terms"])
+<!-- CLAUDE-MEM QUICK REFERENCE -->
+## 🧠 Memory System Quick Reference
+
+### Search Your Memories (SIMPLE & POWERFUL)
+- **Semantic search is king**: `mcp__claude-mem__chroma_query_documents(["search terms"])`
+- **🔒 ALWAYS include project name in query**: `["claude-mem feature authentication"]` not just `["feature authentication"]`
+- **Include dates for temporal search**: `["project-name 2025-09-09 bug fix"]` finds memories from that date
+- **Get specific memory**: `mcp__claude-mem__chroma_get_documents(ids: ["document_id"])`
+
+### Storage
+- Collection: "claude_memories"
+- Archives: ~/.claude-mem/archives/
+<!-- /CLAUDE-MEM QUICK REFERENCE -->
 ```
 
 **Claude knows to search.** No manual reminders needed.

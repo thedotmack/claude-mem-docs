@@ -41,7 +41,7 @@ claude-mem status
   ✅ session-end.js: Found at ~/.claude-mem/hooks/session-end.js
 
 ⚙️  Settings Configuration:
-  📋 Global: ~/.claude/claude_code_settings.json
+  📋 Global: ~/.claude/settings.json
      PreCompact: ✅
      SessionStart: ✅
      SessionEnd: ✅
@@ -56,7 +56,7 @@ claude-mem status
 
 🧠 Chroma Storage Status:
   ✅ Storage backend: Chroma MCP
-  📍 Data location: ~/.claude-mem/index
+  📍 Data location: ~/.claude-mem/chroma
   🔍 Features: Vector search, semantic similarity, document storage
 
 📊 Summary:
@@ -73,7 +73,7 @@ Verifies the presence of three core hook files:
 
 - **pre-compact.js** - Handles memory compression before `/compact`
 - **session-start.js** - Loads context at session startup
-- **session-end.js** - Saves context when sessions end
+- **session-end.js** - Saves before `/clear` when save-on-clear is enabled
 
 <Note>
 Hook files must exist in `~/.claude-mem/hooks/` and have executable permissions
@@ -83,7 +83,7 @@ Hook files must exist in `~/.claude-mem/hooks/` and have executable permissions
 
 Checks hook registration in Claude Code settings:
 
-- **Global Settings** - `~/.claude/claude_code_settings.json`
+- **Global Settings** - `~/.claude/settings.json`
 - **Project Settings** - `./.claude/settings.json` (if present)
 
 Each hook type is verified:
@@ -145,7 +145,7 @@ Some hooks may be missing or misconfigured:
 
 ```
 ⚙️  Settings Configuration:
-  📋 Global: ~/.claude/claude_code_settings.json
+  📋 Global: ~/.claude/settings.json
      PreCompact: ✅
      SessionStart: ❌
      SessionEnd: ✅

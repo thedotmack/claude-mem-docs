@@ -13,24 +13,26 @@ graph LR
     B --> C[Extract Insights]
     C --> D[Generate Summaries]
     D --> E[Create Documents]
-    E --> F[Store in Chroma]
+    E --> F[Update Index & Chroma]
 ```
 
 ## When Compression Happens
 
-Compression triggers automatically:
+Compression runs when one of these triggers fires:
 
 <CardGrid cols={3}>
   <Card title="/compact command" icon="compress">
-    Manual trigger during session
+    Manual trigger during session (default behavior)
   </Card>
   <Card title="/clear command" icon="eraser">
-    Optional save before clearing
+    Optional save before clearing (enable during install)
   </Card>
-  <Card title="Session end" icon="stop">
-    Automatic on session close
+  <Card title="Session end (save-on-clear)" icon="stop">
+    Runs only when `/clear` fires and save-on-clear is enabled
   </Card>
 </CardGrid>
+
+By default only `/compact` is active. The installer can also enable save-on-clear, and you can always call `claude-mem compress <transcript>` manually if you want an extra backup.
 
 ## What Gets Compressed
 
