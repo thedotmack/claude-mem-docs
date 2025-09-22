@@ -5,9 +5,9 @@ description: 'Everything that happens automatically. Zero commands. Zero config.
 
 import { Card, CardGrid } from '/snippets/card-grid.mdx'
 
-Everything below kicks in after a single install. Most workflows are automatic, and we call out the few optional switches so you know when something needs your input.
+Everything below works after installation. Most workflows are automatic. Optional features are clearly marked.
 
-## ⚡ Instant Context Loading
+## Instant Context Loading
 
 **What happens:** Start Claude Code. Recent memories load instantly.
 
@@ -29,7 +29,7 @@ Everything below kicks in after a single install. Most workflows are automatic, 
 
 **How it works:** The session-start hook pulls the latest saved memories for the current project from the local index. Ask Claude to run a semantic search via the claude-mem MCP tools when you need something older or more specific.
 
-## 🧠 Instant Memory Compression
+## Instant Memory Compression
 
 **What happens:** Type `/compact` and the conversation is saved immediately. During installation you can opt-in to also save when `/clear` runs.
 
@@ -51,7 +51,7 @@ security, and Redis for token blacklisting."
 
 **Zero effort.** `/compact` works out of the box, and `/clear` compression is available if you enabled it during install.
 
-## 🗑️ Instant Recovery (Smart Trash™)
+## Instant Recovery (Smart Trash)
 
 **What happens:** Delete something by accident? It's still there.
 
@@ -59,7 +59,7 @@ security, and Redis for token blacklisting."
 # Oops, deleted important memories
 $ claude-mem restore
 
-🗑️ Smart Trash™ Recovery
+🗑️ Smart Trash Recovery
 ────────────────────────────────
 Found 3 deleted items:
 
@@ -71,9 +71,9 @@ Select file to restore:
 ✅ Restored auth-implementation.1726096800
 ```
 
-**Never lose anything.** Smart Trash™ keeps everything recoverable and restores one item at a time so you always know what changed.
+**Never lose data.** Smart Trash keeps everything recoverable. Restore one item at a time to track changes.
 
-## 🔍 Semantic Search on Demand
+## Semantic Search
 
 **What happens:** Ask Claude to run `mcp__claude-mem__chroma_query_documents` and it searches your memories by meaning.
 
@@ -84,9 +84,9 @@ Typical natural-language prompts find:
 - Session management trade-offs
 - Security policies and checklists
 
-**No exact matches needed.** Semantic search is available whenever you call the tool.
+**No exact matches needed.** Call the tool anytime for semantic search.
 
-## 🔄 Instant Session Continuity
+## Session Continuity
 
 **What happens:** Every session builds on the last.
 
@@ -104,7 +104,7 @@ Claude: I see we're using PostgreSQL with Prisma.
 
 **No repetition.** Claude remembers your decisions.
 
-## 📊 Instant Status Check
+## Status Check
 
 **What happens:** One command shows everything.
 
@@ -146,7 +146,7 @@ $ claude-mem status
 
 **Complete visibility.** Know exactly what's happening.
 
-## 🎣 Instant Hook Integration
+## Hook Integration
 
 **What happens:** Claude Code hooks capture everything automatically.
 
@@ -156,7 +156,7 @@ $ claude-mem status
 
 **No manual triggers.** Once installed, the hooks run without any extra commands.
 
-## 🚀 Instant Performance
+## Performance
 
 **What happens:** Everything is optimized for speed.
 
@@ -167,7 +167,7 @@ $ claude-mem status
 
 **Zero lag.** Designed to be invisible.
 
-## 🔐 Instant Privacy
+## Privacy
 
 **What happens:** Your data stays yours.
 
@@ -178,7 +178,7 @@ $ claude-mem status
 
 **Complete privacy.** No cloud. No tracking. Just local memory.
 
-## 🎯 Instant Project Detection
+## Project Detection
 
 **What happens:** Knows which project you're in.
 
@@ -190,7 +190,7 @@ Open `/Users/you/my-app` and claude-mem:
 
 **Smart context.** Each project gets its own memory space.
 
-## 📝 Instant CLAUDE.md Integration
+## CLAUDE.md Integration
 
 **What happens:** Adds memory instructions to your CLAUDE.md automatically.
 
@@ -212,7 +212,7 @@ Open `/Users/you/my-app` and claude-mem:
 
 **Claude knows to search.** No manual reminders needed.
 
-## 🔄 Instant Updates
+## Updates
 
 **What happens:** Stay current automatically.
 
@@ -242,4 +242,4 @@ This is what "it just works" actually means.
 
 ---
 
-**Stop configuring. Start remembering.** 🧠✨
+**Start using claude-mem today.**

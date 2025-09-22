@@ -3,7 +3,7 @@ title: 'load-context'
 description: 'Preview and load available memories from your context index'
 ---
 
-Loads and displays recent memories, overviews, and sessions from your context index with flexible filtering and formatting options.
+Load and display recent memories, overviews, and sessions from your context index with filtering and formatting options.
 
 ## Synopsis
 
@@ -13,7 +13,7 @@ claude-mem load-context [options]
 
 ## Description
 
-The `load-context` command retrieves and displays your stored memories in various formats:
+Retrieve and display stored memories in various formats:
 
 1. **Recent Memories** - Last 10 memory entries
 2. **Project Overviews** - Last 3-5 overview summaries
@@ -57,7 +57,7 @@ Filter memories for a specific project:
 claude-mem load-context --project "my-app"
 ```
 
-Only shows memories tagged with the specified project name.
+Shows only memories tagged with the specified project.
 
 ### JSON Output
 
@@ -95,7 +95,7 @@ Special formatting for Claude Code session initialization:
 claude-mem load-context --format session-start --project "my-app"
 ```
 
-Provides contextual display optimized for loading into new Claude sessions.
+Provides display optimized for new Claude sessions.
 
 ## Output Types
 
@@ -146,7 +146,7 @@ claude-mem load-context --project "$(basename $(pwd))"
 
 ### By Recency
 
-The command automatically shows the most recent items:
+Shows the most recent items:
 
 - **Memories:** Last 10 entries
 - **Overviews:** Last 3-5 entries
@@ -160,7 +160,7 @@ The command automatically shows the most recent items:
 claude-mem load-context --project "nonexistent"
 ```
 
-Returns silently when no memories exist for the specified criteria.
+Returns silently when no memories exist.
 
 ### Permission Issues
 
@@ -216,7 +216,7 @@ claude-mem load-context --format session-start --project "my-project"
 
 ## File Locations
 
-The command reads from these locations:
+Reads from these locations:
 
 | File | Purpose |
 |------|---------|
@@ -224,14 +224,14 @@ The command reads from these locations:
 | `~/.claude-mem/trash/` | Deleted items directory |
 
 <Note>
-The index file uses JSONL format where each line is a separate JSON object representing a memory, overview, or session.
+Index file uses JSONL format - each line is a separate JSON object.
 </Note>
 
 ## Integration
 
 ### With Claude Code
 
-claude-mem automatically calls `load-context` during:
+Automatically calls `load-context` during:
 
 - **Session Start** - Loads recent context
 - **Project Switch** - Filters by project
@@ -239,7 +239,7 @@ claude-mem automatically calls `load-context` during:
 
 ### With Shell Scripts
 
-Common patterns for shell integration:
+Shell integration patterns:
 
 ```bash
 #!/bin/bash

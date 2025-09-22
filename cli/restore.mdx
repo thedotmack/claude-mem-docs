@@ -3,7 +3,7 @@ title: 'restore'
 description: 'Recover deleted memories and files from trash'
 ---
 
-Recovers deleted items from the trash directory through an interactive selection interface.
+Recover deleted items from trash through interactive selection.
 
 ## Synopsis
 
@@ -13,14 +13,14 @@ claude-mem restore
 
 ## Description
 
-The `restore` command provides an interactive way to recover deleted items:
+Recover deleted items interactively:
 
 1. **Interactive Selection** - Choose from available trash items
 2. **Safe Recovery** - Restores to current working directory
 3. **Simple Process** - No complex options or flags needed
 
 <Note>
-The restore command has no options or flags - it's designed to be simple and safe through interactive selection.
+No options or flags - simple and safe through interactive selection.
 </Note>
 
 ## Examples
@@ -45,7 +45,7 @@ claude-mem restore
 Restored config.json.1726405815234
 ```
 
-The file is restored to the current directory with its original name (`config.json`).
+Restores to current directory with original name (`config.json`).
 
 ### Empty Trash
 
@@ -60,11 +60,11 @@ claude-mem restore
 Trash is empty
 ```
 
-No selection interface appears since there are no items to restore.
+No selection interface appears.
 
 ### Canceling Restoration
 
-During the selection process:
+During selection:
 
 1. **Press Esc** or **Ctrl+C** to cancel
 2. No items are restored
@@ -77,22 +77,22 @@ During the selection process:
 ^C
 ```
 
-No output on cancellation - process simply exits.
+No output on cancellation.
 
 ## How Restoration Works
 
 ### File Naming
 
-During restoration, items return to their original names:
+Items return to original names:
 
 - **Trash:** `config.json.1726405815234`
 - **Restored:** `config.json`
 
-The timestamp suffix is automatically removed.
+Timestamp suffix automatically removed.
 
 ### Target Location
 
-Items are restored to the **current working directory**:
+Restore to **current working directory**:
 
 ```bash
 # Working in /home/user/projects/my-app
@@ -103,12 +103,12 @@ claude-mem restore
 ```
 
 <Warning>
-Always ensure you're in the correct directory before running `claude-mem restore` to avoid restoring files to unintended locations.
+Ensure you're in the correct directory before running `claude-mem restore`.
 </Warning>
 
 ### Conflict Handling
 
-If a file with the same name already exists:
+When file exists:
 
 - **Overwrites existing file** without warning
 - No backup of existing file is created
@@ -124,7 +124,7 @@ claude-mem restore
 
 ### Folder Recovery
 
-Directories are restored with full contents:
+Restore directories with full contents:
 
 ```bash
 # Trash contains: project-backup.1726405815234/
@@ -136,7 +136,7 @@ claude-mem restore
 
 ### Directory Structure
 
-Original directory structure is preserved:
+Preserves directory structure:
 
 ```
 # Original structure before deletion:
@@ -162,7 +162,7 @@ project-backup/
 
 ### Navigation
 
-Use standard keyboard controls:
+Keyboard controls:
 
 | Key | Action |
 |-----|---------|
@@ -173,7 +173,7 @@ Use standard keyboard controls:
 
 ### Display Format
 
-Items show their trash names (with timestamps):
+Shows trash names with timestamps:
 
 ```
 ? Select file to restore:
@@ -182,13 +182,13 @@ Items show their trash names (with timestamps):
   session-transcript.log.1726302008789 ← Oldest
 ```
 
-Items are typically ordered by deletion time (newest first).
+Ordered by deletion time (newest first).
 
 ## Use Cases
 
 ### Accidental Deletion Recovery
 
-Quickly recover accidentally deleted files:
+Recover accidentally deleted files:
 
 ```bash
 # Oops, deleted important config
@@ -205,7 +205,7 @@ claude-mem restore
 
 ### Project Restoration
 
-Recover entire deleted project folders:
+Recover project folders:
 
 ```bash
 # Restore full project directory
@@ -216,7 +216,7 @@ claude-mem restore
 
 ### Memory Recovery
 
-Restore deleted memory files:
+Restore memory files:
 
 ```bash
 # Restore accidentally deleted memory index
@@ -248,7 +248,7 @@ Before restoring:
 
 ### Safety
 
-To avoid conflicts:
+Avoid conflicts:
 
 1. **Backup existing files** before restoration
    ```bash
@@ -272,7 +272,7 @@ To avoid conflicts:
 
 ### Permission Denied
 
-If restoration fails due to permissions:
+Permission errors:
 
 ```bash
 claude-mem restore
@@ -294,7 +294,7 @@ claude-mem restore
 
 ### Disk Space
 
-If insufficient space for restoration:
+Insufficient space:
 
 ```bash
 claude-mem restore
@@ -313,7 +313,7 @@ claude-mem restore
 
 ### Corrupted Trash Items
 
-If trash items are corrupted:
+Corrupted items:
 
 ```bash
 claude-mem restore
@@ -333,7 +333,7 @@ claude-mem trash empty
 
 ### With Workflow Scripts
 
-Automate restoration in scripts:
+Automate in scripts:
 
 ```bash
 #!/bin/bash
@@ -348,7 +348,7 @@ echo "Restoring to recovery directory..."
 
 ### With File Management
 
-Common workflow patterns:
+Workflow patterns:
 
 ```bash
 # 1. Check what's available
@@ -400,7 +400,7 @@ claude-mem restore
 
 ### Selection Interface Issues
 
-If selection interface doesn't work:
+Interface issues:
 
 1. **Terminal compatibility** - Ensure terminal supports interactive prompts
 2. **SSH sessions** - May not support interactive mode
@@ -408,7 +408,7 @@ If selection interface doesn't work:
 
 ### Restoration to Wrong Location
 
-If files appear in unexpected location:
+Wrong location:
 
 1. **Check current directory**
    ```bash

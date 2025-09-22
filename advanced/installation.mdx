@@ -6,7 +6,7 @@ description: 'Platform-specific setup, building from source, and complex scenari
 import { Steps } from '/snippets/steps.mdx'
 import { Tabs, Tab } from '/snippets/tabs.mdx'
 
-For when the [simple installation](/installation) doesn't cover your needs.
+Use when [simple installation](/installation) doesn't meet your needs.
 
 ## System Requirements
 
@@ -39,7 +39,7 @@ For when the [simple installation](/installation) doesn't cover your needs.
     ```
 
     ### Permission Issues
-    If you get EACCES errors:
+    For EACCES errors:
     ```bash
     sudo npm install -g claude-mem --unsafe-perm
     claude-mem install
@@ -269,7 +269,7 @@ Complete installation creates:
 │   ├── pre-compact.js    # Before /compact command
 │   ├── session-start.js  # On session start
 │   └── session-end.js    # On session end
-├── trash/                 # Smart Trash™ system
+├── trash/                 # Smart Trash system
 │   ├── memories/         # Deleted memories
 │   └── metadata.json     # Recovery metadata
 ├── logs/                  # System logs

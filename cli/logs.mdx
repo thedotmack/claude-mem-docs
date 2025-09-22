@@ -3,7 +3,7 @@ title: 'logs'
 description: 'View claude-mem activity logs and troubleshoot issues'
 ---
 
-Displays activity logs from claude-mem operations, helping you monitor system behavior and troubleshoot issues.
+Display activity logs from claude-mem operations to monitor system behavior and troubleshoot issues.
 
 ## Synopsis
 
@@ -13,7 +13,7 @@ claude-mem logs [options]
 
 ## Description
 
-The `logs` command shows recent activity from claude-mem operations:
+Shows recent activity from claude-mem operations:
 
 1. **Most Recent Log** - Displays the latest log file by default
 2. **Configurable Output** - Control number of lines shown
@@ -108,7 +108,7 @@ Press Ctrl+C to stop following logs and return to the command prompt.
 
 ## Log Levels
 
-claude-mem uses standard log levels:
+Standard log levels:
 
 ### INFO
 Normal operational messages:
@@ -135,7 +135,7 @@ Error conditions that may affect functionality:
 
 ### File Naming
 
-Log files use date-based naming:
+Date-based naming:
 ```
 ~/.claude-mem/logs/
 ├── claude-mem-2025-09-15.log  # Today's logs
@@ -154,7 +154,7 @@ Log files use date-based naming:
 
 ### Successful Session
 
-Normal operation shows this pattern:
+Normal operation pattern:
 ```
 [INFO] Session start: Loading context
 [INFO] Found X memories for project 'name'
@@ -169,7 +169,7 @@ Normal operation shows this pattern:
 
 ### Compression Issues
 
-Problems during memory compression:
+Compression problems:
 ```
 [INFO] Pre-compact hook triggered
 [ERROR] Failed to read session transcript
@@ -178,7 +178,7 @@ Problems during memory compression:
 
 ### Storage Problems
 
-Issues with file system access:
+File system access issues:
 ```
 [ERROR] Permission denied accessing ~/.claude-mem/index.jsonl
 [ERROR] Failed to write memory to index
@@ -206,7 +206,7 @@ claude-mem logs
 
 ### Permission Errors
 
-Look for permission-related log entries:
+Permission-related log entries:
 ```
 [ERROR] Permission denied accessing settings file
 [ERROR] Failed to create log directory
@@ -224,7 +224,7 @@ chmod 644 ~/.claude-mem/logs/*.log
 
 ### Compression Failures
 
-Monitor compression-related errors:
+Compression-related errors:
 ```
 [ERROR] Failed to compress session: Invalid JSON
 [WARN] Large session detected: 500+ messages
@@ -238,7 +238,7 @@ Monitor compression-related errors:
 
 ### Storage Issues
 
-Watch for storage-related problems:
+Storage-related problems:
 ```
 [ERROR] Failed to write memory to index
 [WARN] Disk space low: 95% full
@@ -261,7 +261,7 @@ claude-mem clean --old
 
 ### Extract Specific Information
 
-Using standard Unix tools:
+Use standard Unix tools:
 
 ```bash
 # Count compression events today
@@ -293,7 +293,7 @@ claude-mem logs --tail 1000 | grep ERROR | wc -l
 
 ### Log Levels
 
-Control logging verbosity in `~/.claude-mem/settings.json`:
+Control verbosity in `~/.claude-mem/settings.json`:
 
 ```json
 {
@@ -322,7 +322,7 @@ claude-mem logs
 
 ### With Shell Scripts
 
-Monitor claude-mem in scripts:
+Monitor in scripts:
 
 ```bash
 #!/bin/bash
@@ -339,7 +339,7 @@ echo "✅ No recent errors"
 
 ### With Monitoring Systems
 
-Export logs for external monitoring:
+Export for external monitoring:
 
 ```bash
 # Export to JSON format
@@ -353,7 +353,7 @@ claude-mem logs --tail 100 | logger -t claude-mem
 
 ### Large Log Files
 
-For very active systems:
+For active systems:
 
 ```bash
 # Check log file sizes

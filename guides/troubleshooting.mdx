@@ -3,17 +3,17 @@ title: "Troubleshooting Claude Memory"
 description: "Common issues, error messages, and step-by-step solutions for claude-mem problems"
 ---
 
-When claude-mem isn't working as expected, this guide provides systematic solutions for the most common issues. Most problems can be resolved in under 2 minutes.
+Systematic solutions for common claude-mem issues. Most problems resolve in under 2 minutes.
 
 ## Quick Diagnosis
 
-Start with the status command to identify issues immediately:
+Start with status command to identify issues:
 
 ```bash
 claude-mem status
 ```
 
-The status output reveals the exact problem:
+Status output reveals the problem:
 
 <AccordionGroup>
   <Accordion title="🔴 Installation: Not Found">
@@ -84,7 +84,7 @@ The status output reveals the exact problem:
     # Should contain index.jsonl file
     ```
 
-    If no index file exists, you haven't created any memories yet. Have a session with Claude Code and the memory will be created automatically.
+    No index file means no memories created yet. Start a Claude Code session to create memories automatically.
   </Step>
 
   <Step title="Verify project name filtering">

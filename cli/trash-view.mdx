@@ -3,7 +3,7 @@ title: 'trash-view'
 description: 'View and manage deleted memories and files'
 ---
 
-Displays the contents of the trash directory, showing deleted memories, files, and folders that can be restored.
+Display contents of the trash directory, showing deleted memories, files, and folders for restoration.
 
 ## Synopsis
 
@@ -13,7 +13,7 @@ claude-mem trash-view
 
 ## Description
 
-The `trash-view` command provides a detailed view of deleted items:
+View deleted items:
 
 1. **File Listing** - Shows all trashed items with metadata
 2. **Size Information** - Displays individual and total sizes
@@ -56,7 +56,7 @@ To empty trash:   claude-mem trash empty
 
 ### Empty Trash
 
-When trash is empty:
+Empty trash:
 
 ```bash
 claude-mem trash-view
@@ -71,7 +71,7 @@ claude-mem trash-view
 
 ### Files
 
-Individual files show:
+File display:
 ```
 📄 filename.ext
    Size: 123.4 KB | Trashed: 9/14/2025, 3:45:22 PM
@@ -85,7 +85,7 @@ Individual files show:
 
 ### Directories
 
-Folders show aggregated information:
+Folder display:
 ```
 📁 folder-name
    Size: 2.3 MB | Trashed: 9/15/2025, 10:30:15 AM
@@ -100,7 +100,7 @@ Folders show aggregated information:
 
 ### Naming Convention
 
-Deleted items are renamed with timestamps:
+Items renamed with timestamps:
 ```
 original-name.timestamp
 ```
@@ -111,14 +111,14 @@ For example:
 
 ### Timestamp Format
 
-Timestamps represent Unix epoch milliseconds:
+Unix epoch milliseconds:
 - `1726405815234` = September 15, 2025, 10:30:15.234 AM
 
-This ensures unique names and preserves deletion order.
+Ensures unique names and preserves deletion order.
 
 ## Size Formatting
 
-Sizes are displayed in human-readable format:
+Human-readable format:
 
 | Range | Format | Example |
 |-------|--------|---------|
@@ -127,18 +127,18 @@ Sizes are displayed in human-readable format:
 | < 1 GB | Megabytes | `2.3 MB` |
 | ≥ 1 GB | Gigabytes | `1.2 GB` |
 
-Precision is limited to 2 decimal places for readability.
+Limited to 2 decimal places.
 
 ## Sorting
 
-Items are displayed in deletion order:
+Deletion order:
 - **Newest first** - Most recently deleted items at top
 - **Chronological** - Based on deletion timestamp
 - **Mixed types** - Files and folders intermixed by date
 
 ## Directory Size Calculation
 
-For folders, size represents total contents:
+Folder size represents total contents:
 
 ```
 project-folder/
@@ -152,7 +152,7 @@ project-folder/
 Total: 90 KB
 ```
 
-The trash view would show:
+Shows:
 ```
 📁 project-folder
    Size: 90 KB | Trashed: 9/15/2025, 10:30:15 AM
@@ -180,7 +180,7 @@ chmod 755 ~/.claude-mem/trash/
 
 ### Corrupted Trash
 
-If trash directory is damaged:
+Damaged trash directory:
 
 ```bash
 claude-mem trash-view
@@ -206,7 +206,7 @@ claude-mem install --force
 
 ### After Viewing Trash
 
-Common next steps:
+Next steps:
 
 ```bash
 # Restore specific item
@@ -221,7 +221,7 @@ claude-mem restore --all
 
 ### Selective Restoration
 
-The trash view helps identify items for restoration:
+Identify items for restoration:
 
 1. **Note the ID** - Copy the unique identifier
 2. **Run restore** - Use `claude-mem restore`
@@ -229,7 +229,7 @@ The trash view helps identify items for restoration:
 
 ## Storage Location
 
-Trash items are stored in:
+Storage location:
 ```
 ~/.claude-mem/trash/
 ├── config.json.1726405815234
@@ -239,21 +239,21 @@ Trash items are stored in:
 ```
 
 <Warning>
-Direct manipulation of trash directory contents may cause issues. Use `claude-mem restore` and `claude-mem trash empty` instead.
+Don't manipulate trash directory directly. Use `claude-mem restore` and `claude-mem trash empty`.
 </Warning>
 
 ## Performance Considerations
 
 ### Large Directories
 
-For folders with many files:
+Large folders:
 - Size calculation may take time
 - Progress not shown during scan
 - Consider using `claude-mem trash empty` for large cleanups
 
 ### Many Items
 
-With numerous trash items:
+Many items:
 - All items displayed (no pagination)
 - Consider regular cleanup
 - Use `claude-mem trash empty` periodically
@@ -262,7 +262,7 @@ With numerous trash items:
 
 ### With Scripts
 
-Check trash status programmatically:
+Check status programmatically:
 
 ```bash
 #!/bin/bash
@@ -292,7 +292,7 @@ fi
 
 ### Missing Items
 
-If expected items don't appear:
+Missing items:
 
 1. **Check spelling** - Verify original filename
 2. **Check timing** - Item might not be in trash
@@ -301,7 +301,7 @@ If expected items don't appear:
 
 ### Size Discrepancies
 
-If sizes seem incorrect:
+Size discrepancies:
 
 1. **Hidden files** - May include system files
 2. **Symlinks** - Links counted as files
@@ -309,7 +309,7 @@ If sizes seem incorrect:
 
 ### Restore Issues
 
-If restoration seems unavailable:
+Restore issues:
 
 1. **Check IDs** - Ensure correct identifier format
 2. **Check permissions** - Verify write access to destination

@@ -5,7 +5,7 @@ description: 'Complete reference for claude-mem command-line interface'
 
 ## CLI Reference
 
-claude-mem provides a simple yet powerful command-line interface for managing your memory system.
+claude-mem provides a command-line interface for managing your memory system.
 
 ## Available Commands
 
@@ -77,7 +77,7 @@ Commands for system maintenance:
 
 ## Quick Examples
 
-### Check Everything is Working
+### Check Status
 
 ```bash
 claude-mem status
@@ -103,7 +103,7 @@ claude-mem restore <memory-id>
 
 ## Output Formats
 
-Most commands support multiple output formats:
+Commands support multiple output formats:
 
 ```bash
 # Default human-readable
@@ -131,7 +131,7 @@ claude-mem uses `~/.claude-mem/settings.json`:
 
 ## Environment Variables
 
-You can override settings with environment variables:
+Override settings with environment variables:
 
 | Variable | Description | Default |
 |----------|-------------|---------|
@@ -154,7 +154,7 @@ claude-mem uses standard exit codes:
 
 ## Scripting
 
-claude-mem commands are designed for scripting:
+Use claude-mem in scripts:
 
 ```bash
 #!/bin/bash

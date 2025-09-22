@@ -3,11 +3,11 @@ title: "Hooks API"
 description: "Document the hooks system and available hook points"
 ---
 
-The Hooks API provides event-driven integration with Claude Code's lifecycle events. This system allows you to automatically compress transcripts, load context, and respond to various session events.
+Use the Hooks API for event-driven integration with Claude Code lifecycle events. Automatically compress transcripts, load context, and respond to session events.
 
 ## Hook System Overview
 
-Claude-mem integrates with Claude Code through a hooks system that responds to specific events:
+Integrate with Claude Code through hooks that respond to events:
 
 - **PreCompact** - Before transcript compression
 - **SessionStart** - When a new session begins
@@ -21,7 +21,7 @@ Claude-mem integrates with Claude Code through a hooks system that responds to s
 
 ### Base Hook Payload
 
-All hooks receive a base payload structure:
+Base payload structure:
 
 ```typescript
 interface HookPayload {
@@ -115,7 +115,7 @@ interface StopPayload extends HookPayload {
 
 ### Base Hook Response
 
-All hooks can return a base response structure:
+Base response structure:
 
 ```typescript
 interface BaseHookResponse {
@@ -174,7 +174,7 @@ interface PreToolUseResponse extends BaseHookResponse {
 
 ### PreCompact Hook
 
-Automatically compresses session transcripts before Claude Code compacts them:
+Compress session transcripts before Claude Code compacts them:
 
 ```typescript
 import { preCompactHook } from 'claude-mem/commands/hooks';
@@ -200,7 +200,7 @@ preCompactHook().catch(error => {
 
 ### SessionStart Hook
 
-Loads relevant context at the beginning of new sessions:
+Load relevant context at session start:
 
 ```typescript
 import { sessionStartHook } from 'claude-mem/commands/hooks';
@@ -226,7 +226,7 @@ sessionStartHook().catch(error => {
 
 ### SessionEnd Hook
 
-Handles session cleanup and optional compression:
+Handle session cleanup and optional compression:
 
 ```typescript
 import { sessionEndHook } from 'claude-mem/commands/hooks';
@@ -254,7 +254,7 @@ sessionEndHook().catch(error => {
 
 ### Installation
 
-Hooks are installed via the `claude-mem install` command:
+Install hooks with `claude-mem install`:
 
 ```bash
 # Install all hooks
@@ -282,7 +282,7 @@ claude-mem status
 
 ### Shared Utilities
 
-Hook scripts can use shared utilities:
+Use shared utilities in hook scripts:
 
 ```javascript
 // hooks/shared/hook-helpers.js
@@ -303,7 +303,7 @@ export function createErrorResponse(reason, additionalData) {
 
 ### Creating Custom Hooks
 
-You can create custom hooks for additional events:
+Create custom hooks for additional events:
 
 ```typescript
 // custom-hooks/my-custom-hook.ts

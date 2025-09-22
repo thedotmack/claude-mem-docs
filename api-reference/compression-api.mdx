@@ -3,13 +3,13 @@ title: "Compression API"
 description: "Document the compression/transcript processing APIs"
 ---
 
-The Compression API transforms Claude Code conversation transcripts into searchable memory documents. This system analyzes conversations, extracts key insights, and stores them in a vector database for future retrieval.
+Transform Claude Code transcripts into searchable memory documents. Analyze conversations, extract insights, and store in a vector database.
 
 ## Core Classes
 
 ### TranscriptCompressor
 
-The main compression engine that processes Claude Code transcripts.
+Main compression engine for Claude Code transcripts.
 
 ```typescript
 class TranscriptCompressor {
@@ -74,7 +74,7 @@ const archivePath = await compressor.compress(
 
 #### Compression Process
 
-The compression follows these stages:
+Compression stages:
 
 1. **Reading** - Parse JSONL transcript file
 2. **Analyzing** - Extract conversation structure and content
@@ -83,7 +83,7 @@ The compression follows these stages:
 
 ### ChunkManager
 
-Handles large transcripts that exceed token limits through intelligent chunking.
+Handle large transcripts exceeding token limits through chunking.
 
 ```typescript
 class ChunkManager {
@@ -171,7 +171,7 @@ if (chunkManager.needsChunking(content)) {
 
 ### PromptOrchestrator
 
-Manages prompt generation for LLM analysis and human context.
+Manage prompt generation for LLM analysis.
 
 ```typescript
 class PromptOrchestrator {
@@ -249,7 +249,7 @@ const sessionPrompt = orchestrator.createSessionStartPrompt(sessionContext);
 
 ### Transcript Message Structure
 
-The system processes various message types from Claude Code transcripts:
+Process various message types from transcripts:
 
 ```typescript
 interface TranscriptMessage {
@@ -291,7 +291,7 @@ interface ToolUseResult {
 
 ### Content Extraction
 
-The system intelligently extracts content from different message types:
+Extract content from different message types:
 
 <CodeGroup>
 
@@ -356,7 +356,7 @@ interface CompressionResult {
 
 ### Memory Document Format
 
-Extracted memories follow this JSON structure:
+Memory JSON structure:
 
 ```typescript
 interface ExtractedMemory {
@@ -370,7 +370,7 @@ interface ExtractedMemory {
 
 ### Archive Structure
 
-Compressed sessions create these artifacts:
+Compression artifacts:
 
 ```
 ~/.claude-mem/

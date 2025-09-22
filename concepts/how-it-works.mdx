@@ -3,9 +3,9 @@ title: 'How It Works'
 description: 'Understanding the claude-mem architecture and workflow'
 ---
 
-## How claude-mem Works
+## How It Works
 
-claude-mem creates a persistent memory layer for your Claude Code sessions, automatically capturing and recalling important context.
+claude-mem creates a persistent memory layer for Claude Code sessions, capturing and recalling context automatically.
 
 ## Architecture Overview
 
@@ -50,7 +50,7 @@ graph TB
 
 ### 1. Hook System
 
-claude-mem integrates with Claude Code through three main hooks:
+claude-mem uses three hooks:
 
 <CardGrid cols={3}>
   <Card title="session-start" icon="play">
@@ -66,7 +66,7 @@ claude-mem integrates with Claude Code through three main hooks:
 
 ### 2. Memory Compression
 
-When a session ends or you trigger compression:
+During compression:
 
 <Steps>
   <Step>
@@ -92,11 +92,11 @@ When you start a new session:
 3. **Ranking** - Orders by recency and session grouping
 4. **Display** - Shows formatted context in session start
 
-The hook reads `~/.claude-mem/claude-mem-index.jsonl`, so you always see the most recent summaries even without running a Chroma query.
+The hook reads `~/.claude-mem/claude-mem-index.jsonl` for recent summaries without Chroma queries.
 
 ## Memory Storage
 
-claude-mem writes each summary to a local JSONL index and asks Claude (via MCP) to persist the same document in Chroma:
+claude-mem writes summaries to local JSONL and persists in Chroma via MCP:
 
 ```javascript
 {
@@ -141,7 +141,7 @@ claude-mem writes each summary to a local JSONL index and asks Claude (via MCP) 
 
 ## Compression Algorithm
 
-The transcript compressor uses intelligent extraction:
+Transcript compression process:
 
 <Tabs>
   <Tab title="Input Processing">
@@ -181,7 +181,7 @@ The transcript compressor uses intelligent extraction:
 
 ## Semantic Search
 
-claude-mem uses vector embeddings for intelligent retrieval:
+Vector search process:
 
 1. **Query Embedding** - Converts search query to vector
 2. **Similarity Search** - Finds closest matches in Chroma
@@ -199,7 +199,7 @@ const results = await chroma.query({
 
 ## MCP Integration
 
-claude-mem leverages Model Context Protocol (MCP) for Chroma:
+MCP integration with Chroma:
 
 <Note>
   MCP provides a standardized way for Claude Code to interact with external tools like Chroma DB.
@@ -227,7 +227,7 @@ claude-mem leverages Model Context Protocol (MCP) for Chroma:
 
 ## Performance Optimization
 
-claude-mem is designed for speed:
+Performance features:
 
 <CardGrid cols={2}>
   <Card title="Minified Bundle" icon="box">
@@ -246,7 +246,7 @@ claude-mem is designed for speed:
 
 ## Data Flow Example
 
-Here's a complete example of the claude-mem lifecycle:
+Complete claude-mem lifecycle:
 
 ```mermaid
 sequenceDiagram

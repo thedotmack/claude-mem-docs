@@ -3,13 +3,13 @@ title: "API Overview"
 description: "Overview of claude-mem APIs and how to use them programmatically"
 ---
 
-Claude-mem provides a comprehensive set of APIs for integrating memory compression and transcript processing into your applications. This guide covers the main API surfaces and how to use them programmatically.
+Use claude-mem APIs to integrate memory compression and transcript processing into your applications.
 
 ## Core API Components
 
 ### 1. Memory Storage & Retrieval APIs
 
-Claude-mem uses the Model Context Protocol (MCP) for memory operations, providing a standardized interface for vector database operations through ChromaDB.
+Use Model Context Protocol (MCP) for memory operations with ChromaDB.
 
 **Key Features:**
 - Document storage and retrieval
@@ -19,7 +19,7 @@ Claude-mem uses the Model Context Protocol (MCP) for memory operations, providin
 
 ### 2. Compression APIs
 
-The compression system transforms Claude Code conversation transcripts into searchable memory documents.
+Transform Claude Code transcripts into searchable memory documents.
 
 **Key Features:**
 - Transcript parsing and analysis
@@ -29,7 +29,7 @@ The compression system transforms Claude Code conversation transcripts into sear
 
 ### 3. Hooks System
 
-Event-driven hooks that integrate with Claude Code's lifecycle events.
+Integrate with Claude Code lifecycle events.
 
 **Key Features:**
 - Session lifecycle events
@@ -39,7 +39,7 @@ Event-driven hooks that integrate with Claude Code's lifecycle events.
 
 ### 4. Configuration & Settings
 
-Centralized configuration management for paths, settings, and project detection.
+Manage paths, settings, and project detection.
 
 **Key Features:**
 - Settings persistence
@@ -72,7 +72,7 @@ console.log(`Archive created: ${archivePath}`);
 
 ## API Architecture
 
-Claude-mem follows a layered architecture:
+Layered architecture:
 
 ```
 ┌─────────────────────┐
@@ -100,7 +100,7 @@ Claude-mem follows a layered architecture:
 
 ### Settings File
 
-Claude-mem stores configuration in `~/.claude-mem/settings.json`:
+Configuration in `~/.claude-mem/settings.json`:
 
 ```json
 {
@@ -122,7 +122,7 @@ Claude-mem stores configuration in `~/.claude-mem/settings.json`:
 
 ## Error Handling
 
-All APIs use typed error classes:
+Typed error classes:
 
 ```typescript
 import { CompressionError, HookError } from 'claude-mem';
@@ -140,7 +140,7 @@ try {
 
 ## TypeScript Support
 
-Claude-mem is written in TypeScript with full type definitions included:
+TypeScript with full type definitions:
 
 ```typescript
 import type {

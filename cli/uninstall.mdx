@@ -3,7 +3,7 @@ title: 'uninstall'
 description: 'Remove claude-mem integration from Claude Code'
 ---
 
-Removes claude-mem hooks from Claude Code settings while preserving your memory data and compressed transcripts.
+Remove claude-mem hooks from Claude Code settings while preserving memory data and compressed transcripts.
 
 ## Synopsis
 
@@ -13,7 +13,7 @@ claude-mem uninstall [options]
 
 ## Description
 
-The `uninstall` command safely removes claude-mem integration:
+The `uninstall` command removes claude-mem integration:
 
 1. **Hook Removal** - Removes all three hook types from settings
 2. **Settings Backup** - Creates backup before modification
@@ -21,7 +21,7 @@ The `uninstall` command safely removes claude-mem integration:
 4. **Multiple Locations** - Handles both global and project settings
 
 <Note>
-Uninstalling removes the integration but preserves all your compressed transcripts and memory data. You can reinstall at any time without losing data.
+Uninstalling removes integration but preserves compressed transcripts and memory data. Reinstall anytime without losing data.
 </Note>
 
 ## Options
@@ -43,7 +43,7 @@ claude-mem uninstall
 
 **Sample Output:**
 ```
-🔄 Uninstalling Claude Memory System hooks...
+🔄 Uninstalling claude-mem hooks...
 
 ✅ Removed PreCompact hook from User settings
 ✅ Removed SessionStart hook from User settings
@@ -52,7 +52,7 @@ claude-mem uninstall
 ✅ Updated User settings: ~/.claude/claude_code_settings.json
 
 ✨ Uninstallation complete!
-The Claude Memory System hooks have been removed from your settings.
+claude-mem hooks removed from settings.
 
 Note: Your compressed transcripts and archives are preserved.
 To reinstall: claude-mem install
@@ -78,7 +78,7 @@ claude-mem uninstall --all
 
 **Sample Output:**
 ```
-🔄 Uninstalling Claude Memory System hooks...
+🔄 Uninstalling claude-mem hooks...
 
 ✅ Removed PreCompact hook from User settings
 ✅ Removed SessionStart hook from User settings
@@ -89,7 +89,7 @@ claude-mem uninstall --all
 ⏭️  No hooks configured in Project settings
 
 ✨ Uninstallation complete!
-The Claude Memory System hooks have been removed from your settings.
+claude-mem hooks removed from settings.
 
 Note: Your compressed transcripts and archives are preserved.
 To reinstall: claude-mem install
@@ -99,7 +99,7 @@ To reinstall: claude-mem install
 
 ### Hook Types
 
-The command removes all three hook types:
+Removes all three hook types:
 
 #### PreCompact Hooks
 Triggered before `/compact` command:
@@ -148,7 +148,7 @@ Triggered at session end:
 
 ### Settings Locations
 
-The command can target different settings files:
+Target different settings files:
 
 | Target | File Location | Command |
 |--------|---------------|---------|
@@ -160,7 +160,7 @@ The command can target different settings files:
 
 ### Automatic Backups
 
-Before modifying any settings file, a timestamped backup is created:
+Creates timestamped backup before modifying settings:
 
 ```
 ~/.claude/claude_code_settings.json.backup.1726405815234
@@ -190,13 +190,13 @@ Only the hook registrations in Claude Code settings are removed.
 
 ### Hook Detection
 
-The command intelligently detects claude-mem hooks by looking for:
+Detects claude-mem hooks by:
 
 - **Exact path matches** - Direct hook script paths
 - **Filename patterns** - Scripts containing `pre-compact.js`, `session-start.js`, `session-end.js`
 - **Command patterns** - Commands containing `claude-mem`
 
-This ensures only claude-mem hooks are removed, leaving other hooks intact.
+Only removes claude-mem hooks, preserving other hooks.
 
 ## Selective Removal
 
@@ -246,7 +246,7 @@ Only claude-mem hooks are removed; other hooks remain.
 
 ### Clean-up Behavior
 
-The command performs thorough cleanup:
+Performs thorough cleanup:
 
 1. **Remove claude-mem hooks** from hook arrays
 2. **Remove empty arrays** if no hooks remain
@@ -299,7 +299,7 @@ After uninstalling:
 
 ### Data Access
 
-Your data remains accessible:
+Data remains accessible:
 
 ```bash
 # View preserved memories
@@ -327,7 +327,7 @@ claude-mem install
 claude-mem install --force
 ```
 
-All your preserved data will be immediately available.
+All preserved data immediately available.
 
 ## Troubleshooting
 
@@ -393,7 +393,7 @@ claude-mem install
 
 ### Confirm Uninstall
 
-After uninstalling, verify removal:
+Verify removal after uninstalling:
 
 ```bash
 # Check system status

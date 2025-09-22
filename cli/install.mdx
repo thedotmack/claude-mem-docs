@@ -3,9 +3,9 @@ title: 'install'
 description: 'Set up claude-mem integration with Claude Code'
 ---
 
-## claude-mem install
+## Synopsis
 
-Sets up the claude-mem integration with Claude Code by installing hooks, configuring the MCP server, and creating necessary directories.
+Set up claude-mem integration with Claude Code by installing hooks, configuring the MCP server, and creating necessary directories.
 
 ## Synopsis
 
@@ -15,7 +15,7 @@ claude-mem install [options]
 
 ## Description
 
-The `install` command performs a complete setup of claude-mem:
+The `install` command sets up claude-mem:
 
 1. Creates directory structure at `~/.claude-mem`
 2. Installs Claude Code hooks
@@ -43,7 +43,7 @@ claude-mem install
 
 Output:
 ```
-🧠 Claude Memory System Installer
+🧠 claude-mem Installer
 ────────────────────────────────
 
 ✅ Creating directories... Done
@@ -125,7 +125,7 @@ Adds to `~/.claude/CLAUDE.md`:
 
 ## Interactive Mode
 
-If run without options, the installer enters interactive mode:
+Without options, the installer uses interactive mode:
 
 ```
 🧠 Welcome to claude-mem installer!
@@ -146,7 +146,7 @@ If run without options, the installer enters interactive mode:
 
 ## Backup and Recovery
 
-When an existing installation is detected:
+When detecting an existing installation:
 
 1. Creates timestamped backup
 2. Saves to `~/.claude-mem/backups/`
@@ -184,8 +184,8 @@ which claude
 
 ### Hooks Not Working
 
-After installation:
-1. Fully quit Claude Code (Cmd+Q / Ctrl+Q)
+After installing:
+1. Quit Claude Code completely (Cmd+Q / Ctrl+Q)
 2. Reopen Claude Code
 3. Verify with `claude-mem status`
 
@@ -203,7 +203,7 @@ npm install -g @modelcontextprotocol/server-chromadb
 
 ## Post-Installation
 
-After successful installation:
+After installing:
 
 <Steps>
   <Step>
@@ -225,7 +225,7 @@ To remove claude-mem:
 claude-mem uninstall
 ```
 
-This removes hooks but preserves your memories.
+Removes hooks but preserves memories.
 
 ## See Also
 
